@@ -1,4 +1,3 @@
-import { SideBar } from "../layouts/sidebar-components/SideBar";
 import { StockCard } from "../components/card-components/StockCard";
 import { MyPieChart } from "../components/chart-components/MyPieChart";
 import { MyAreaChart } from "../components/chart-components/MyAreaChart";

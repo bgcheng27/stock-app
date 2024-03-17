@@ -10,10 +10,8 @@ import {
 } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { useEffect, useState } from "react";
-import { number_format } from "../../js/formatters";
 
 import { Line } from "react-chartjs-2";
-import { afterHours, convertToAMPM } from "../../js/dateHelpers";
 
 Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#858796';

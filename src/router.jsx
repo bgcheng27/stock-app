@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 
 import { RouteLayout } from "./layouts/RouteLayout";
 import { homeRoute } from "./pages/Home";
-// import { demoRoute } from "./pages/StockInfo";
 import { stockInfoRoute } from "./pages/StockInfo";
 import { quantRoute } from "./pages/Quant";
 import { dashboardRoute } from "./pages/Dashboard";

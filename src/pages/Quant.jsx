@@ -14,10 +14,8 @@ Author: Brian Cheng
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-import { getFinancials } from "../api/financials";
 import { useLoaderData } from "react-router-dom";
 
-import { MyPieChart } from "../components/chart-components/MyPieChart";
 import { MyAreaChart } from "../components/chart-components/MyAreaChart";
 
 export function Quant() {

@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-// To Be
-const USER_STOCKS = ["GOOG", "HD", "JPM", "JNJ"]
+export const USER_STOCKS = ["GOOG", "HD", "JPM", "JNJ", "TSLA", "NVDA"]
 
 export function CollapseItems({ children }) {
   return (

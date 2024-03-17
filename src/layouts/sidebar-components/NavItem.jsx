@@ -2,8 +2,7 @@ import { NavLink } from "react-router-dom"
 import { CollapseItems } from "./CollapseItems";
 
 export function NavItem({ children, name, icon, to = "#", collapsable = false, control }) {
-  // CHANGE ID to USE ID. PLEASE!!!!!
-
+  // Can useId be used here?
 
   return (
     <li className="nav-item">

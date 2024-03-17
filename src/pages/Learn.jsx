@@ -1,5 +1,4 @@
 function Learn() {
-  throw new Error("K")
   
   return (
     <>

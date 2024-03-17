@@ -1,8 +1,7 @@
-import { Link, Outlet, useNavigation } from "react-router-dom";
+import { Outlet, useNavigation } from "react-router-dom";
 import { SideBar } from "./sidebar-components/SideBar";
 import { TopBar } from "./TopBar";
 import { ContentErrorBoundary } from "./error-boundaries/ContentErrorBoundary";
-import { ErrorPage } from "../pages/ErrorPage";
 
 export function RouteLayout() {
   const { state } = useNavigation();

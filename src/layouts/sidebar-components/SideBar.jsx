@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { NavItem } from "./NavItem";
+import { USER_STOCKS } from "./CollapseItems";
 
 export function SideBar() {
   const [isToggled, setIsToggled] = useState(false);
@@ -37,18 +38,11 @@ export function SideBar() {
           collapsable={true}
           control="collapseStocks"
         >
-          <NavLink className="collapse-item" to="/stocks/GOOG">
-            GOOG
-          </NavLink>
-          <NavLink className="collapse-item" to="/stocks/HD">
-            HD
-          </NavLink>
-          <NavLink className="collapse-item" to="/stocks/JPM">
-            JPM
-          </NavLink>
-          <NavLink className="collapse-item" to="/stocks/JNJ">
-            JNJ
-          </NavLink>
+          {USER_STOCKS.map((stock) => {
+            return <NavLink className="collapse-item" to={`/stocks/${stock}`}>
+              {stock}
+            </NavLink>
+          })}
         </NavItem>
 
         <NavItem name="Demo" icon="fa-chart-area" to="/demo" />

@@ -13,14 +13,17 @@ import { Table } from "../components/table-compenents/Table";
 import { BasicCard } from "../components/card-components/BasicCard";
 
 import { useLoaderData } from "react-router-dom";
-import { ProgressBar } from "../components/ProgressBar";
 import { getLiquidity, getNetProfitMargin } from "../js/quantAnalysis";
 import { useReducer, useMemo } from "react";
 
 import { FINANCIALS } from "../api/financials";
 import { TableRow } from "../components/table-compenents/TableRow";
-import { camelize, formatDateForTable, number_format, twoDecimal } from "../js/formatters";
-import { DropdownCard } from "../components/card-components/DropdownCard";
+import {
+  camelize,
+  formatDateForTable,
+  number_format,
+  twoDecimal,
+} from "../js/formatters";
 import { MyAreaChart } from "../components/chart-components/MyAreaChart";
 import {
   getQuote,
@@ -28,7 +31,11 @@ import {
   getTimeSeries,
   getTimeSeriesDemo,
 } from "../api/marketData";
-import { afterHours, convertToAMPM, extractTime, formatDateTimeLabel, formatMonthDay, setIntradayArray } from "../js/dateHelpers";
+import {
+  extractTime,
+  formatDateTimeLabel,
+  setIntradayArray,
+} from "../js/dateHelpers";
 
 const INCOME_STATEMENT_LABELS = [
   "Total Revenue",
@@ -57,7 +64,7 @@ const TABLE_CONFIG = {
 
 const NUM_INTERVALS = 3;
 
-const IS_DEMO = false;
+const IS_DEMO = true;
 const EXTENDED_HOURS = false;
 
 const GRAPH_INTERVAL = IS_DEMO ? "5min" : "1min";
@@ -93,7 +100,7 @@ function StockInfo() {
   } = useLoaderData();
 
   if (error) {
-    throw new Error(error)
+    throw new Error(error);
   }
 
   const [financials, dispatch] = useReducer(reducer, {
@@ -110,56 +117,39 @@ function StockInfo() {
         return {
           dateTime: key,
           open: twoDecimal(dataPoints[key]["1. open"]),
-          volume: number_format(dataPoints[key]["5. volume"])
+          volume: number_format(dataPoints[key]["5. volume"]),
         };
       })
       .sort((a, b) => {
         return new Date(a.dateTime) - new Date(b.dateTime);
       });
 
-    return setIntradayArray(
-      quoteData["07. latest trading day"],
-      initialData
-    );
-
+    return setIntradayArray(quoteData["07. latest trading day"], initialData);
   }, [dataPoints]);
-
 
   const volumeArray = useMemo(() => {
     return sortedData.map((item) => {
-      return item.volume
-    })
-  }, [sortedData])
-
+      return item.volume;
+    });
+  }, [sortedData]);
 
   const openArray = useMemo(() => {
     return sortedData.map((item) => {
-      return item.open
-    })
-  }, [sortedData])
-
+      return item.open;
+    });
+  }, [sortedData]);
 
   const dateTimeArray = useMemo(() => {
     return sortedData.map((item) => {
       return formatDateTimeLabel(item.dateTime);
-    })
-  }, [sortedData])
-
+    });
+  }, [sortedData]);
 
   const timeLabels = useMemo(() => {
     return dateTimeArray.map((dateTime) => {
-      return extractTime(dateTime)
-    })
-  }, [dateTimeArray])
-
-
-
-
-
-
-  // console.log(sortedData);
-  // console.log(dateTimeArray)
-  // console.log(volumeArray)
+      return extractTime(dateTime);
+    });
+  }, [dateTimeArray]);
 
   function toggleIntervalType(type) {
     dispatch({
@@ -203,8 +193,6 @@ function StockInfo() {
     });
   }
 
-  // throw new Error("ERRORS KGJKLSJFLKS")
-
   return (
     <>
       <h1 className="h3 mb-0 text-gray-800 mb-4">{symbol}</h1>
@@ -235,9 +223,12 @@ function StockInfo() {
 
             <div className="d-flex justify-content-between">
               <span>Day Range:</span>
-              <span>${twoDecimal(quoteData["04. low"])} - ${twoDecimal(quoteData["03. high"])}</span>
+              <span>
+                ${twoDecimal(quoteData["04. low"])} - $
+                {twoDecimal(quoteData["03. high"])}
+              </span>
             </div>
-            
+
             <div className="d-flex justify-content-between">
               <span>Volume:</span>
               <span>{number_format(quoteData["06. volume"])}</span>
@@ -248,48 +239,46 @@ function StockInfo() {
 
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
       <div className="row d-flex flex-row justify-content-between">
-            <div>
-              <button
-                onClick={() =>
-                  displayFinancialStatement(TABLE_CONFIG.INCOME_STATMENT)
-                }
-                className="btn btn-danger mb-3"
-              >
-                Income Statement
-              </button>
-              <button
-                onClick={() =>
-                  displayFinancialStatement(TABLE_CONFIG.BALANCE_SHEET)
-                }
-                className="btn btn-warning mb-3"
-              >
-                Balance Sheet
-              </button>
-              <button
-                onClick={() =>
-                  displayFinancialStatement(TABLE_CONFIG.CASH_FLOW)
-                }
-                className="btn btn-success mb-3"
-              >
-                Cash Flow Statement
-              </button>
-            </div>
+        <div>
+          <button
+            onClick={() =>
+              displayFinancialStatement(TABLE_CONFIG.INCOME_STATMENT)
+            }
+            className="btn btn-danger mb-3"
+          >
+            Income Statement
+          </button>
+          <button
+            onClick={() =>
+              displayFinancialStatement(TABLE_CONFIG.BALANCE_SHEET)
+            }
+            className="btn btn-warning mb-3"
+          >
+            Balance Sheet
+          </button>
+          <button
+            onClick={() => displayFinancialStatement(TABLE_CONFIG.CASH_FLOW)}
+            className="btn btn-success mb-3"
+          >
+            Cash Flow Statement
+          </button>
+        </div>
 
-            <div>
-              <button
-                onClick={() => toggleIntervalType(TABLE_CONFIG.ANNUAL)}
-                className="btn btn-primary mb-3"
-              >
-                Annual
-              </button>
-              <button
-                onClick={() => toggleIntervalType(TABLE_CONFIG.QUARTERLY)}
-                className="btn btn-secondary mb-3"
-              >
-                Quarterly
-              </button>
-            </div>
-          </div>
+        <div>
+          <button
+            onClick={() => toggleIntervalType(TABLE_CONFIG.ANNUAL)}
+            className="btn btn-primary mb-3"
+          >
+            Annual
+          </button>
+          <button
+            onClick={() => toggleIntervalType(TABLE_CONFIG.QUARTERLY)}
+            className="btn btn-secondary mb-3"
+          >
+            Quarterly
+          </button>
+        </div>
+      </div>
       <div className="row">
         <div className="col-xl-6 col-lg-4">
           <BasicCard
@@ -371,8 +360,6 @@ function StockInfo() {
           </BasicCard>
         </div>
       </div>
-
-      
     </>
   );
 }
@@ -380,51 +367,48 @@ function StockInfo() {
 async function loader({ request: { signal }, params: { symbol } }) {
   try {
     let incomeStatementData,
-    balanceSheetData,
-    cashFlowData,
-    marketData,
-    quoteData;
+      balanceSheetData,
+      cashFlowData,
+      marketData,
+      quoteData;
 
-  if (IS_DEMO) {
-    incomeStatementData = financialsDemo(FINANCIALS.INCOME_STATEMENT, {
-      signal,
-    });
-    balanceSheetData = financialsDemo(FINANCIALS.BALANCE_SHEET, { signal });
-    cashFlowData = financialsDemo(FINANCIALS.CASH_FLOW, { signal });
-    marketData = await getTimeSeriesDemo({ signal });
-    quoteData = await getQuoteDemo({ signal });
-  } else {
-    incomeStatementData = await getFinancials(
-      FINANCIALS.INCOME_STATEMENT,
-      symbol.toUpperCase(),
-      { signal }
-    );
-    balanceSheetData = await getFinancials(
-      FINANCIALS.BALANCE_SHEET,
-      symbol.toUpperCase(),
-      { signal }
-    );
-    cashFlowData = await getFinancials(
-      FINANCIALS.CASH_FLOW,
-      symbol.toUpperCase(),
-      { signal }
-    );
-    marketData = await getTimeSeries(
-      "TIME_SERIES_INTRADAY",
-      symbol.toUpperCase(),
-      GRAPH_INTERVAL,
-      "false",
-      "full",
-      { signal }
-    );
-    quoteData = await getQuote(symbol.toUpperCase(), { signal });
-
-    // console.log(marketData["Information"])
-    // console.log(quoteData["Information"])
-
+    if (IS_DEMO) {
+      incomeStatementData = financialsDemo(FINANCIALS.INCOME_STATEMENT, {
+        signal,
+      });
+      balanceSheetData = financialsDemo(FINANCIALS.BALANCE_SHEET, { signal });
+      cashFlowData = financialsDemo(FINANCIALS.CASH_FLOW, { signal });
+      marketData = await getTimeSeriesDemo({ signal });
+      quoteData = await getQuoteDemo({ signal });
+    } else {
+      incomeStatementData = await getFinancials(
+        FINANCIALS.INCOME_STATEMENT,
+        symbol.toUpperCase(),
+        { signal }
+      );
+      balanceSheetData = await getFinancials(
+        FINANCIALS.BALANCE_SHEET,
+        symbol.toUpperCase(),
+        { signal }
+      );
+      cashFlowData = await getFinancials(
+        FINANCIALS.CASH_FLOW,
+        symbol.toUpperCase(),
+        { signal }
+      );
+      marketData = await getTimeSeries(
+        "TIME_SERIES_INTRADAY",
+        symbol.toUpperCase(),
+        GRAPH_INTERVAL,
+        "false",
+        "full",
+        { signal }
+      );
+      quoteData = await getQuote(symbol.toUpperCase(), { signal });
+    }
 
     if (marketData["Information"] || quoteData["Information"]) {
-      throw new Error("Failed to retrieve Data")
+      throw new Error("Failed to retrieve Data");
     }
 
     return {
@@ -436,12 +420,10 @@ async function loader({ request: { signal }, params: { symbol } }) {
       dataPoints: marketData[`Time Series (${GRAPH_INTERVAL})`],
       quoteData: quoteData["Global Quote"],
     };
-  }
-
   } catch (error) {
-    console.log("Error: ", error)
+    console.log("Error: ", error);
 
-    return { error: error.message }
+    return { error: error.message };
   }
 }
 
