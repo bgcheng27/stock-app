@@ -1,7 +1,6 @@
-# Stock Market Application
+# Demo Branch
 
-This application provides a detailed quantitative analysis of each individual company,
-their financial standings, and news.
+This version of the project is set to be deployed in the near future.
 
 Author: Brian Cheng
 
