@@ -11,7 +11,7 @@ export function NotFound() {
         <p className="text-gray-500 mb-0">
           The page you are looking for does not seem to exist...
         </p>
-        <Link to="/dashboard">&larr; Back to Dashboard</Link>
+        <Link to="/">&larr; Back to Dashboard</Link>
       </div>
     </>
   );

@@ -1,6 +1,5 @@
 import { Outlet, useNavigation } from "react-router-dom";
 import { SideBar } from "./sidebar-components/SideBar";
-import { TopBar } from "./TopBar";
 import { ContentErrorBoundary } from "./error-boundaries/ContentErrorBoundary";
 
 export function RouteLayout() {
@@ -16,9 +15,7 @@ export function RouteLayout() {
 
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content">
-            {/* Top Bar */}
-            <TopBar />
-            <div className="container-fluid">
+            <div className="container-fluid py-4">
               <ContentErrorBoundary>
                 <Outlet />
               </ContentErrorBoundary>

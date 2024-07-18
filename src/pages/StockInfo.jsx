@@ -13,7 +13,6 @@ import { Table } from "../components/table-compenents/Table";
 import { BasicCard } from "../components/card-components/BasicCard";
 
 import { useLoaderData } from "react-router-dom";
-import { getLiquidity, getNetProfitMargin } from "../js/quantAnalysis";
 import { useReducer, useMemo } from "react";
 
 import { FINANCIALS } from "../api/financials";
@@ -36,6 +35,8 @@ import {
   formatDateTimeLabel,
   setIntradayArray,
 } from "../js/dateHelpers";
+import { HttpError } from "../errors/HttpError";
+import { ERROR_MESSAGES } from "../js/mockData";
 
 const INCOME_STATEMENT_LABELS = [
   "Total Revenue",
@@ -51,6 +52,7 @@ const CASH_FLOW_LABELS = [
   "Cashflow From Financing",
 ];
 
+
 const TABLE_CONFIG = {
   // interval type
   ANNUAL: "annualReports",
@@ -65,7 +67,6 @@ const TABLE_CONFIG = {
 const NUM_INTERVALS = 3;
 
 const IS_DEMO = true;
-const EXTENDED_HOURS = false;
 
 const GRAPH_INTERVAL = IS_DEMO ? "5min" : "1min";
 
@@ -103,6 +104,7 @@ function StockInfo() {
     throw new Error(error);
   }
 
+  // if symbol does not exist, throw 404
   const [financials, dispatch] = useReducer(reducer, {
     cardTitle: "Income Statement",
     currentLabelList: INCOME_STATEMENT_LABELS,
@@ -239,6 +241,7 @@ function StockInfo() {
 
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
       <div className="row d-flex flex-row justify-content-between">
+        <div className="col-xl-8 col-lg-5">
         <div>
           <button
             onClick={() =>
@@ -278,9 +281,12 @@ function StockInfo() {
             Quarterly
           </button>
         </div>
+        </div>
       </div>
+
+      {/* Financial Statements */}
       <div className="row">
-        <div className="col-xl-6 col-lg-4">
+        <div className="col-xl-8 col-lg-5">
           <BasicCard
             title={`${financials.cardTitle} (${
               financials.intervalType === "annualReports"
@@ -323,40 +329,6 @@ function StockInfo() {
                 })}
               </tbody>
             </Table>
-          </BasicCard>
-        </div>
-
-        <div className="col-xl-6 col-lg-4">
-          <BasicCard
-            title={`Quantitative Analysis (${
-              financials.intervalType === "annualReports"
-                ? "Annual"
-                : "Quarterly"
-            })`}
-          >
-            <p>
-              Liquidity:{" "}
-              {getLiquidity(
-                balanceSheetData[financials.intervalType][0].totalAssets,
-                balanceSheetData[financials.intervalType][0].totalLiabilities
-              )}
-            </p>
-            <p>
-              Net Profit Margin:{" "}
-              {getNetProfitMargin(
-                incomeStatementData[financials.intervalType][0].netIncome,
-                incomeStatementData[financials.intervalType][0].totalRevenue
-              )}
-              %
-            </p>
-            <p>
-              Cash Flow: <span className="text-success">+420,000,000</span>
-            </p>
-            {/* <p>P/E Ratio: <span className="text-success">{getLiquidity(incomeStatement)}</span> </p>      */}
-            <p>P / Sharing Ratio: </p>
-            <p>
-              Overall Standing: <span className="text-success">Good!</span>
-            </p>
           </BasicCard>
         </div>
       </div>
@@ -408,7 +380,7 @@ async function loader({ request: { signal }, params: { symbol } }) {
     }
 
     if (marketData["Information"] || quoteData["Information"]) {
-      throw new Error("Failed to retrieve Data");
+      throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
     }
 
     return {
