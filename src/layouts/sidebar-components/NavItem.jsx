@@ -14,7 +14,6 @@ export function NavItem({ children, name, icon, to = "#", collapsable = false, c
           "data-target": `#${control}`,
           "aria-expanded": "true",
           "aria-controls": `${control}`,
-          "onClick": () => console.log("Close"),
         })}
       >
         <i className={`fas fa-fw ${icon}`}></i>
