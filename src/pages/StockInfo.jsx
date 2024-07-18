@@ -37,6 +37,7 @@ import {
 } from "../js/dateHelpers";
 import { HttpError } from "../errors/HttpError";
 import { ERROR_MESSAGES } from "../js/mockData";
+import { fetchStockData } from "../js/handleStockAPI";
 
 const INCOME_STATEMENT_LABELS = [
   "Total Revenue",
@@ -68,7 +69,6 @@ const NUM_INTERVALS = 3;
 
 const IS_DEMO = true;
 
-const GRAPH_INTERVAL = IS_DEMO ? "5min" : "1min";
 
 function reducer(financials, { type, payload }) {
   switch (type) {
@@ -199,8 +199,11 @@ function StockInfo() {
     <>
       <h1 className="h3 mb-0 text-gray-800 mb-4">{symbol}</h1>
 
+      {/* Top Row */}
       <div className="row">
         <div className="col-xl-8 col-lg-5">
+
+          {/* Stock Area Chart */}
           <BasicCard title={symbol}>
             <MyAreaChart
               xTimeLabels={timeLabels}
@@ -211,6 +214,8 @@ function StockInfo() {
             />
           </BasicCard>
         </div>
+
+        {/* Stock Info: (Open, Close, High, etc.) */}
         <div className="col-xl-4 col-lg-2">
           <BasicCard title="Quote">
             <div className="d-flex justify-content-between">
@@ -239,6 +244,7 @@ function StockInfo() {
         </div>
       </div>
 
+      {/* Set Financial State Menu */}
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
       <div className="row d-flex flex-row justify-content-between">
         <div className="col-xl-8 col-lg-5">
@@ -294,6 +300,7 @@ function StockInfo() {
                 : "Quarterly"
             })`}
           >
+
             {/* <Table /> */}
             <Table>
               <thead>
@@ -338,63 +345,8 @@ function StockInfo() {
 
 async function loader({ request: { signal }, params: { symbol } }) {
   try {
-    let incomeStatementData,
-      balanceSheetData,
-      cashFlowData,
-      marketData,
-      quoteData;
-
-    if (IS_DEMO) {
-      incomeStatementData = financialsDemo(FINANCIALS.INCOME_STATEMENT, {
-        signal,
-      });
-      balanceSheetData = financialsDemo(FINANCIALS.BALANCE_SHEET, { signal });
-      cashFlowData = financialsDemo(FINANCIALS.CASH_FLOW, { signal });
-      marketData = await getTimeSeriesDemo({ signal });
-      quoteData = await getQuoteDemo({ signal });
-    } else {
-      incomeStatementData = await getFinancials(
-        FINANCIALS.INCOME_STATEMENT,
-        symbol.toUpperCase(),
-        { signal }
-      );
-      balanceSheetData = await getFinancials(
-        FINANCIALS.BALANCE_SHEET,
-        symbol.toUpperCase(),
-        { signal }
-      );
-      cashFlowData = await getFinancials(
-        FINANCIALS.CASH_FLOW,
-        symbol.toUpperCase(),
-        { signal }
-      );
-      marketData = await getTimeSeries(
-        "TIME_SERIES_INTRADAY",
-        symbol.toUpperCase(),
-        GRAPH_INTERVAL,
-        "false",
-        "full",
-        { signal }
-      );
-      quoteData = await getQuote(symbol.toUpperCase(), { signal });
-    }
-
-    if (marketData["Information"] || quoteData["Information"]) {
-      throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
-    }
-
-    return {
-      incomeStatementData: await incomeStatementData,
-      balanceSheetData: await balanceSheetData,
-      cashFlowData: await cashFlowData,
-
-      symbol: marketData["Meta Data"]["2. Symbol"],
-      dataPoints: marketData[`Time Series (${GRAPH_INTERVAL})`],
-      quoteData: quoteData["Global Quote"],
-    };
+    return fetchStockData(IS_DEMO, signal, symbol);
   } catch (error) {
-    console.log("Error: ", error);
-
     return { error: error.message };
   }
 }

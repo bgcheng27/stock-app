@@ -81,11 +81,6 @@ export function MyAreaChart({ xTimeLabels, xLabels, xData, xVolume, previousClos
     })
   }, [xData, previousClose])
 
-  // TODO: Extended Hours
-
-  // > 4:00pm: 
-
-
 
   const areaData = {
     labels: xTimeLabels,
