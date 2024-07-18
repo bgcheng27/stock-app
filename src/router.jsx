@@ -1,43 +1,26 @@
-import { createBrowserRouter } from "react-router-dom";
-
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RouteLayout } from "./layouts/RouteLayout";
-import { homeRoute } from "./pages/Home";
-import { stockInfoRoute } from "./pages/StockInfo";
-import { quantRoute } from "./pages/Quant";
-import { dashboardRoute } from "./pages/Dashboard";
-import { learnRoute } from "./pages/Learn";
-import { articleRoute } from "./pages/Article";
+
+
+/* Routes */
 
 import { NotFound } from "./pages/NotFound";
+import { stockInfoRoute } from "./pages/StockInfo";
+
 
 export const router = createBrowserRouter([
   { path: "/", element: <RouteLayout />, children:
     [
-      { index: true, ...homeRoute },
+      { index: true, element: <Navigate to="/stocks/IBM" />},
       { path: "*", element: <NotFound /> },
+      
       { 
         path: "stocks",
         children: [
-          { index: true, ...homeRoute },
+          { index: true, element: <Navigate to="/stocks/IBM" />},
           { path: ":symbol", ...stockInfoRoute }
         ]
       },
-      { path: "demo", ...stockInfoRoute },
-      { path: "quant", ...quantRoute },
-      { path: "dashboard", ...dashboardRoute },
-      { path: "learn", ...learnRoute },
-      { 
-        path: "articles",
-        children: [
-          { 
-            path: ":title",  
-            children: [
-              { index: true, ...articleRoute },
-              { path: ":subtitle", ...articleRoute }
-            ]
-          }
-        ]
-      }
     ]
   }
 ])
