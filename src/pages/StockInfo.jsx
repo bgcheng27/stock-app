@@ -8,15 +8,11 @@ Author: Brian Cheng
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-import { Table } from "../components/table-compenents/Table";
 import { BasicCard } from "../components/card-components/BasicCard";
+import { Table } from "../components/table-compenents/Table";
+import { TableRow } from "../components/table-compenents/TableRow";
 
 import { useLoaderData } from "react-router-dom";
-import { useReducer } from "react";
-
-
-import { TableRow } from "../components/table-compenents/TableRow";
 import {
   camelize,
   formatDateForTable,
@@ -26,47 +22,15 @@ import {
 import { MyAreaChart } from "../components/chart-components/MyAreaChart";
 
 
-import { fetchStockData } from "../js/handleStockAPI";
+import { fetchStockData } from "../js/hooks/fetchStockData";
 import { useSortedMarketData } from "../js/hooks/useSortedMarketData";
+import { useFinancials } from "../js/hooks/useFinancials";
+import { TABLE_CONFIG } from "../js/hooks/useFinancials";
 
-
-import { INCOME_STATEMENT_LABELS, BALANCE_SHEET_LABELS, CASH_FLOW_LABELS } from "../js/mockData";
-
-
-const TABLE_CONFIG = {
-  // interval type
-  ANNUAL: "annualReports",
-  QUARTERLY: "quarterlyReports",
-
-  // financial statement
-  INCOME_STATMENT: "INCOME_STATEMENT",
-  BALANCE_SHEET: "BALANCE_SHEET",
-  CASH_FLOW: "CASH_FLOW",
-};
 
 const NUM_INTERVALS = 3;
-
 const IS_DEMO = true;
 
-
-function reducer(financials, { type, payload }) {
-  switch (type) {
-    case "SET_INTERVAL_TYPE":
-      return {
-        ...financials,
-        intervalType: payload.intervalType,
-      };
-    case "DISPLAY_FINANCIAL_STATEMENT":
-      return {
-        ...financials,
-        cardTitle: payload.cardTitle,
-        currentData: payload.currentData,
-        currentLabelList: payload.currentLabelList,
-      };
-    default:
-      return financials;
-  }
-}
 
 function StockInfo() {
   const {
@@ -79,70 +43,21 @@ function StockInfo() {
     error,
   } = useLoaderData();
 
+
   if (error) {
     throw new Error(error);
   }
 
-  // if symbol does not exist, throw 404
-  const [financials, dispatch] = useReducer(reducer, {
-    cardTitle: "Income Statement",
-    currentLabelList: INCOME_STATEMENT_LABELS,
-    currentData: incomeStatementData,
-    intervalType: "annualReports",
-  });
 
-  // Create a useMemo hook to sort out the data points
+  const { financials, toggleIntervalType, displayFinancialStatement } = useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
   const { volumeArray, openArray, dateTimeArray, timeLabels } = useSortedMarketData(dataPoints, quoteData)
 
-
-  function toggleIntervalType(type) {
-    dispatch({
-      type: "SET_INTERVAL_TYPE",
-      payload: {
-        intervalType: type,
-      },
-    });
-  }
-
-  function displayFinancialStatement(type) {
-    let cardTitle;
-    let currentData;
-    let currentLabelList;
-
-    switch (type) {
-      case TABLE_CONFIG.INCOME_STATMENT:
-        cardTitle = "Income Statement";
-        currentData = incomeStatementData;
-        currentLabelList = INCOME_STATEMENT_LABELS;
-        break;
-      case TABLE_CONFIG.BALANCE_SHEET:
-        cardTitle = "Balance Sheet";
-        currentData = balanceSheetData;
-        currentLabelList = BALANCE_SHEET_LABELS;
-        break;
-      case TABLE_CONFIG.CASH_FLOW:
-        cardTitle = "Cash Flow";
-        currentData = cashFlowData;
-        currentLabelList = CASH_FLOW_LABELS;
-        break;
-      default:
-        break;
-    }
-    dispatch({
-      type: "DISPLAY_FINANCIAL_STATEMENT",
-      payload: {
-        cardTitle,
-        currentData,
-        currentLabelList,
-      },
-    });
-  }
 
   return (
     <>
       <h1 className="h3 mb-0 text-gray-800 mb-4">{symbol}</h1>
 
-      {/* Top Row */}
+      {/* Area Chart */}
       <div className="row">
         <div className="col-xl-8 col-lg-5">
 

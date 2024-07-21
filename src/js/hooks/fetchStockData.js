@@ -1,6 +1,6 @@
-import { FINANCIALS, financialsDemo, getFinancials } from "../api/financials";
-import { getQuote, getQuoteDemo, getTimeSeries, getTimeSeriesDemo } from "../api/marketData";
-import { ERROR_MESSAGES } from "../js/mockData"
+import { FINANCIALS, financialsDemo, getFinancials } from "../../api/financials";
+import { getQuote, getQuoteDemo, getTimeSeries, getTimeSeriesDemo } from "../../api/marketData";
+import { ERROR_MESSAGES } from "../mockData"
 
 // maybe a custom hook
 export async function fetchStockData(isDemo, signal, symbol) {
