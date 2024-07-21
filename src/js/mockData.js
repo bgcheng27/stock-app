@@ -6,6 +6,21 @@ export const ERROR_MESSAGES = {
   FAILED_TO_RETRIEVE_DATA: "Failed to retrieve Data",
 }
 
+export const INCOME_STATEMENT_LABELS = [
+  "Total Revenue",
+  "Cost of Revenue",
+  "Gross Profit",
+  "Operating Expenses",
+  "Net Income",
+];
+export const BALANCE_SHEET_LABELS = ["Total Assets", "Total Liabilities"];
+
+export const CASH_FLOW_LABELS = [
+  "Operating Cashflow",
+  "Cashflow From Investment",
+  "Cashflow From Financing",
+];
+
 export function parseErrorMessage(message) {
   return `Error: ${message}`
 }

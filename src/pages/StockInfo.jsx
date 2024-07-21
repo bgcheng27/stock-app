@@ -8,14 +8,14 @@ Author: Brian Cheng
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-import { financialsDemo, getFinancials } from "../api/financials";
+
 import { Table } from "../components/table-compenents/Table";
 import { BasicCard } from "../components/card-components/BasicCard";
 
 import { useLoaderData } from "react-router-dom";
-import { useReducer, useMemo } from "react";
+import { useReducer } from "react";
 
-import { FINANCIALS } from "../api/financials";
+
 import { TableRow } from "../components/table-compenents/TableRow";
 import {
   camelize,
@@ -24,34 +24,13 @@ import {
   twoDecimal,
 } from "../js/formatters";
 import { MyAreaChart } from "../components/chart-components/MyAreaChart";
-import {
-  getQuote,
-  getQuoteDemo,
-  getTimeSeries,
-  getTimeSeriesDemo,
-} from "../api/marketData";
-import {
-  extractTime,
-  formatDateTimeLabel,
-  setIntradayArray,
-} from "../js/dateHelpers";
-import { HttpError } from "../errors/HttpError";
-import { ERROR_MESSAGES } from "../js/mockData";
-import { fetchStockData } from "../js/handleStockAPI";
 
-const INCOME_STATEMENT_LABELS = [
-  "Total Revenue",
-  "Cost of Revenue",
-  "Gross Profit",
-  "Operating Expenses",
-  "Net Income",
-];
-const BALANCE_SHEET_LABELS = ["Total Assets", "Total Liabilities"];
-const CASH_FLOW_LABELS = [
-  "Operating Cashflow",
-  "Cashflow From Investment",
-  "Cashflow From Financing",
-];
+
+import { fetchStockData } from "../js/handleStockAPI";
+import { useSortedMarketData } from "../js/hooks/useSortedMarketData";
+
+
+import { INCOME_STATEMENT_LABELS, BALANCE_SHEET_LABELS, CASH_FLOW_LABELS } from "../js/mockData";
 
 
 const TABLE_CONFIG = {
@@ -113,45 +92,8 @@ function StockInfo() {
   });
 
   // Create a useMemo hook to sort out the data points
-  const sortedData = useMemo(() => {
-    const initialData = Object.keys(dataPoints)
-      .map((key) => {
-        return {
-          dateTime: key,
-          open: twoDecimal(dataPoints[key]["1. open"]),
-          volume: number_format(dataPoints[key]["5. volume"]),
-        };
-      })
-      .sort((a, b) => {
-        return new Date(a.dateTime) - new Date(b.dateTime);
-      });
+  const { volumeArray, openArray, dateTimeArray, timeLabels } = useSortedMarketData(dataPoints, quoteData)
 
-    return setIntradayArray(quoteData["07. latest trading day"], initialData);
-  }, [dataPoints]);
-
-  const volumeArray = useMemo(() => {
-    return sortedData.map((item) => {
-      return item.volume;
-    });
-  }, [sortedData]);
-
-  const openArray = useMemo(() => {
-    return sortedData.map((item) => {
-      return item.open;
-    });
-  }, [sortedData]);
-
-  const dateTimeArray = useMemo(() => {
-    return sortedData.map((item) => {
-      return formatDateTimeLabel(item.dateTime);
-    });
-  }, [sortedData]);
-
-  const timeLabels = useMemo(() => {
-    return dateTimeArray.map((dateTime) => {
-      return extractTime(dateTime);
-    });
-  }, [dateTimeArray]);
 
   function toggleIntervalType(type) {
     dispatch({
@@ -166,6 +108,7 @@ function StockInfo() {
     let cardTitle;
     let currentData;
     let currentLabelList;
+
     switch (type) {
       case TABLE_CONFIG.INCOME_STATMENT:
         cardTitle = "Income Statement";
