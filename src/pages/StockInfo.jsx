@@ -115,13 +115,15 @@ function StockInfo() {
       {/* Set Financial State Menu */}
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
       <div className="row">
-        <div className="col-xl-8 col-lg-5 d-flex justify-contenbt-between">
+        <div className="col-xl-8 col-lg-5 d-flex mb-3">
           <DropdownMenu
+            color="primary"
             options={statementDisplayTextArray}
             fn={displayFinancialStatement}
           ></DropdownMenu>
 
           <DropdownMenu
+            color="secondary"
             options={intervalTypeDisplayTextArray}
             fn={toggleIntervalType}
           ></DropdownMenu>

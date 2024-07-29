@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiKeyVal } from "../js/data/financialsConfig";
 
 
-export function DropdownMenu({ options, fn }) {
+export function DropdownMenu({ color, options, fn }) {
   const [isShowing, setIsShowing] = useState(false);
   const [selected, setSelected] = useState(options[0])
   const ref = useRef(null);
@@ -20,9 +20,9 @@ export function DropdownMenu({ options, fn }) {
   }, [ref])
 
   return (
-    <div className="dropdown w-25" ref={ref}>
+    <div className="dropdown" style={{ width: "auto" }} ref={ref}>
       <button
-        className="btn btn-secondary dropdown-toggle"
+        className={`btn btn-${color} dropdown-toggle`}
         id="dropdownMenuButton"
         type="button"
         onClick={() => setIsShowing((p) => !p)}
@@ -30,7 +30,7 @@ export function DropdownMenu({ options, fn }) {
         {selected}
       </button>
 
-      <div className={`dropdown-menu ${isShowing ? "show" : ""}`}>
+      <div className={`dropdown-menu ${isShowing ? "show" : ""}`} >
         {options.map((option) => {
           return (
             <div

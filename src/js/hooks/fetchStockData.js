@@ -19,7 +19,7 @@ export async function fetchStockData(isDemo, signal, symbol) {
       signal,
     });
     balanceSheetData = financialsDemo(BALANCE_SHEET.apiCall, { signal });
-    cashFlowData = financialsDemo(CASH_FLOW, { signal });
+    cashFlowData = financialsDemo(CASH_FLOW.apiCall, { signal });
     marketData = await getTimeSeriesDemo({ signal });
     quoteData = await getQuoteDemo({ signal });
   } else {
