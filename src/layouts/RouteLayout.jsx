@@ -1,6 +1,7 @@
 import { Outlet, useNavigation } from "react-router-dom";
-import { SideBar } from "./sidebar-components/SideBar";
 import { ContentErrorBoundary } from "./error-boundaries/ContentErrorBoundary";
+import { TopBar } from "./TopBar";
+
 
 export function RouteLayout() {
   const { state } = useNavigation();
@@ -11,11 +12,12 @@ export function RouteLayout() {
     <div className={isLoading ? "loading-spinner" : undefined}></div>
       <div id="wrapper" className={isLoading ? "loading" : undefined}>
         {/* Sidebar */}
-        <SideBar />
+        {/* <SideBar /> */}
 
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content">
-            <div className="container-fluid py-4">
+            <TopBar />
+            <div className="container-fluid py-2 px-5">
               <ContentErrorBoundary>
                 <Outlet />
               </ContentErrorBoundary>

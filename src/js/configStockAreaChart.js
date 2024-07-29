@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-export const LINE_COLOR = {
+const LINE_COLOR = {
   SUCCESS: "28, 200, 138",
   DANGER: "231, 74, 59",
   GRAY: "20, 20, 20",
 };
 
-export const GRAPH_STYLES = {
+const GRAPH_STYLES = {
   fill: true,
   pointHoverRadius: 3,
   pointRadius: 0,
@@ -14,14 +14,14 @@ export const GRAPH_STYLES = {
   pointBorderWidth: 2,
 };
 
-export const PREV_CLOSE_STYLES = {
+const PREV_CLOSE_STYLES = {
   borderColor: `rgba(${LINE_COLOR.GRAY}, 0.8)`,
   borderDash: [5, 3],
   borderWidth: 1,
   pointRadius: 0,
 };
 
-export const TOOL_TIPS_STYLES = {
+const TOOL_TIPS_STYLES = {
   mode: "single",
   backgroundColor: "rgb(255,255,255)",
   bodyColor: "#858796",
