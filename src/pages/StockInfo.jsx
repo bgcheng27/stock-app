@@ -42,8 +42,11 @@ function StockInfo() {
     symbol,
     dataPoints,
     quoteData,
+    description,
     error,
   } = useLoaderData();
+
+  console.log(description)
 
   if (incomeStatementData["Information"]) {
     throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
@@ -68,7 +71,7 @@ function StockInfo() {
 
       {/* Area Chart */}
       <div className="row">
-        <div className="col-xl-8 col-lg-5">
+        <div className="col-xl-8 col-lg-6">
           {/* Stock Area Chart */}
           <BasicCard title={symbol}>
             <StockAreaChart
@@ -84,7 +87,7 @@ function StockInfo() {
         </div>
 
         {/* Stock Info: (Open, Close, High, etc.) */}
-        <div className="col-xl-4 col-lg-2">
+        <div className="col-xl-4 col-lg-6">
           <BasicCard title="Quote">
             <div className="d-flex justify-content-between">
               <span>Previous Close:</span>
@@ -115,7 +118,7 @@ function StockInfo() {
       {/* Set Financial State Menu */}
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
       <div className="row">
-        <div className="col-xl-8 col-lg-5 d-flex mb-3">
+        <div className="col-xl-8 col-lg-6 d-flex mb-3">
           <DropdownMenu
             color="primary"
             options={statementDisplayTextArray}
@@ -132,7 +135,7 @@ function StockInfo() {
 
       {/* Financial Statements */}
       <div className="row">
-        <div className="col-xl-8 col-lg-5">
+        <div className="col-xl-8 col-lg-6">
           <BasicCard
             title={`${financials.cardTitle} (${
               financials.intervalType === "annualReports"
@@ -175,6 +178,11 @@ function StockInfo() {
                 })}
               </tbody>
             </Table>
+          </BasicCard>
+        </div>
+        <div className="col-xl-4 col-lg-2">
+          <BasicCard title="About">
+            <p>{description} <a href={`https://en.wikipedia.org/wiki/${symbol}`}>Wikipedia</a></p>
           </BasicCard>
         </div>
       </div>
