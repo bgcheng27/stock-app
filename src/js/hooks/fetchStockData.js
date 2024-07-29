@@ -1,6 +1,7 @@
-import { FINANCIALS, financialsDemo, getFinancials } from "../../api/financials";
+import { financialsDemo, getFinancials } from "../../api/financials";
 import { getQuote, getQuoteDemo, getTimeSeries, getTimeSeriesDemo } from "../../api/marketData";
 import { ERROR_MESSAGES } from "../mockData"
+import { INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW } from "../data/financialsConfig"
 
 // maybe a custom hook
 export async function fetchStockData(isDemo, signal, symbol) {
@@ -8,31 +9,32 @@ export async function fetchStockData(isDemo, signal, symbol) {
     balanceSheetData,
     cashFlowData,
     marketData,
-    quoteData;
+    quoteData,
+    expectedSymbol;
 
   const GRAPH_INTERVAL = isDemo ? "5min" : "1min";
   
   if (isDemo) {
-    incomeStatementData = financialsDemo(FINANCIALS.INCOME_STATEMENT, {
+    incomeStatementData = financialsDemo(INCOME_STATEMENT.apiCall, {
       signal,
     });
-    balanceSheetData = financialsDemo(FINANCIALS.BALANCE_SHEET, { signal });
-    cashFlowData = financialsDemo(FINANCIALS.CASH_FLOW, { signal });
+    balanceSheetData = financialsDemo(BALANCE_SHEET.apiCall, { signal });
+    cashFlowData = financialsDemo(CASH_FLOW, { signal });
     marketData = await getTimeSeriesDemo({ signal });
     quoteData = await getQuoteDemo({ signal });
   } else {
-    incomeStatementData = await getFinancials(
-      FINANCIALS.INCOME_STATEMENT,
+    incomeStatementData = getFinancials(
+      INCOME_STATEMENT.apiCall,
       symbol.toUpperCase(),
       { signal }
     );
-    balanceSheetData = await getFinancials(
-      FINANCIALS.BALANCE_SHEET,
+    balanceSheetData = getFinancials(
+      BALANCE_SHEET.apiCall,
       symbol.toUpperCase(),
       { signal }
     );
     cashFlowData = await getFinancials(
-      FINANCIALS.CASH_FLOW,
+      CASH_FLOW.apiCall,
       symbol.toUpperCase(),
       { signal }
     );
@@ -47,16 +49,19 @@ export async function fetchStockData(isDemo, signal, symbol) {
     quoteData = await getQuote(symbol.toUpperCase(), { signal });
   }
 
-  if (marketData["Information"] || quoteData["Information"]) {
-    throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
+  if (marketData["Meta Data"]) {
+    expectedSymbol = marketData["Meta Data"]["2. Symbol"]
+  } else {
+    expectedSymbol = undefined
   }
+
 
   return {
     incomeStatementData: await incomeStatementData,
     balanceSheetData: await balanceSheetData,
     cashFlowData: await cashFlowData,
 
-    symbol: marketData["Meta Data"]["2. Symbol"],
+    symbol: expectedSymbol,
     dataPoints: marketData[`Time Series (${GRAPH_INTERVAL})`],
     quoteData: quoteData["Global Quote"],
   };

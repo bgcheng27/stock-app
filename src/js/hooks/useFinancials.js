@@ -1,21 +1,6 @@
 import { useReducer } from "react";
-import {
-  BALANCE_SHEET_LABELS,
-  CASH_FLOW_LABELS,
-  INCOME_STATEMENT_LABELS,
-} from "../mockData";
 
-
-export const TABLE_CONFIG = {
-  // interval type
-  ANNUAL: "annualReports",
-  QUARTERLY: "quarterlyReports",
-
-  // financial statement
-  INCOME_STATMENT: "INCOME_STATEMENT",
-  BALANCE_SHEET: "BALANCE_SHEET",
-  CASH_FLOW: "CASH_FLOW",
-};
+import { INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW } from "../data/financialsConfig";
 
 
 function reducer(financials, { type, payload }) {
@@ -42,9 +27,10 @@ export function useFinancials(
   balanceSheetData,
   cashFlowData
 ) {
+
   const [financials, dispatch] = useReducer(reducer, {
-    cardTitle: "Income Statement",
-    currentLabelList: INCOME_STATEMENT_LABELS,
+    cardTitle: INCOME_STATEMENT.displayText,
+    currentLabelList: INCOME_STATEMENT.labels,
     currentData: incomeStatementData,
     intervalType: "annualReports",
   });
@@ -64,20 +50,20 @@ export function useFinancials(
     let currentLabelList;
 
     switch (type) {
-      case TABLE_CONFIG.INCOME_STATMENT:
-        cardTitle = "Income Statement";
+      case INCOME_STATEMENT.apiCall:
+        cardTitle = INCOME_STATEMENT.displayText;
+        currentLabelList = INCOME_STATEMENT.labels;
         currentData = incomeStatementData;
-        currentLabelList = INCOME_STATEMENT_LABELS;
         break;
-      case TABLE_CONFIG.BALANCE_SHEET:
-        cardTitle = "Balance Sheet";
+      case BALANCE_SHEET.apiCall:
+        cardTitle = BALANCE_SHEET.displayText;
+        currentLabelList = BALANCE_SHEET.labels;
         currentData = balanceSheetData;
-        currentLabelList = BALANCE_SHEET_LABELS;
         break;
-      case TABLE_CONFIG.CASH_FLOW:
-        cardTitle = "Cash Flow";
+      case CASH_FLOW.apiCall:
+        cardTitle = CASH_FLOW.displayText
+        currentLabelList = CASH_FLOW.labels
         currentData = cashFlowData;
-        currentLabelList = CASH_FLOW_LABELS;
         break;
       default:
         break;
