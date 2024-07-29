@@ -19,18 +19,20 @@ import {
   number_format,
   twoDecimal,
 } from "../js/formatters";
-import { MyAreaChart } from "../components/chart-components/MyAreaChart";
-
+import { StockAreaChart } from "../components/chart-components/StockAreaChart";
 
 import { fetchStockData } from "../js/hooks/fetchStockData";
 import { useSortedMarketData } from "../js/hooks/useSortedMarketData";
 import { useFinancials } from "../js/hooks/useFinancials";
-import { TABLE_CONFIG } from "../js/hooks/useFinancials";
-
+import { DropdownMenu } from "../components/DropdownMenu";
+import {
+  intervalTypeDisplayTextArray,
+  statementDisplayTextArray,
+} from "../js/data/financialsConfig";
+import { ERROR_MESSAGES } from "../js/mockData";
 
 const NUM_INTERVALS = 3;
 const IS_DEMO = true;
-
 
 function StockInfo() {
   const {
@@ -43,15 +45,22 @@ function StockInfo() {
     error,
   } = useLoaderData();
 
+  if (incomeStatementData["Information"]) {
+    throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
+  }
+
+  if (symbol == undefined) {
+    throw new Error(ERROR_MESSAGES.SYMBOL_NOT_FOUND);
+  }
 
   if (error) {
     throw new Error(error);
   }
 
-
-  const { financials, toggleIntervalType, displayFinancialStatement } = useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
-  const { volumeArray, openArray, dateTimeArray, timeLabels } = useSortedMarketData(dataPoints, quoteData)
-
+  const { financials, toggleIntervalType, displayFinancialStatement } =
+    useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
+  const { volumeArray, openArray, dateTimeArray, timeLabels } =
+    useSortedMarketData(dataPoints, quoteData);
 
   return (
     <>
@@ -60,15 +69,16 @@ function StockInfo() {
       {/* Area Chart */}
       <div className="row">
         <div className="col-xl-8 col-lg-5">
-
           {/* Stock Area Chart */}
           <BasicCard title={symbol}>
-            <MyAreaChart
-              xTimeLabels={timeLabels}
-              xLabels={dateTimeArray}
-              xData={openArray}
-              xVolume={volumeArray}
-              previousClose={quoteData["08. previous close"]}
+            <StockAreaChart
+              config={{
+                xTimeLabels: timeLabels,
+                xLabels: dateTimeArray,
+                xData: openArray,
+                xVolume: volumeArray,
+                previousClose: quoteData["08. previous close"],
+              }}
             />
           </BasicCard>
         </div>
@@ -104,47 +114,17 @@ function StockInfo() {
 
       {/* Set Financial State Menu */}
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
-      <div className="row d-flex flex-row justify-content-between">
-        <div className="col-xl-8 col-lg-5">
-        <div>
-          <button
-            onClick={() =>
-              displayFinancialStatement(TABLE_CONFIG.INCOME_STATMENT)
-            }
-            className="btn btn-danger mb-3"
-          >
-            Income Statement
-          </button>
-          <button
-            onClick={() =>
-              displayFinancialStatement(TABLE_CONFIG.BALANCE_SHEET)
-            }
-            className="btn btn-warning mb-3"
-          >
-            Balance Sheet
-          </button>
-          <button
-            onClick={() => displayFinancialStatement(TABLE_CONFIG.CASH_FLOW)}
-            className="btn btn-success mb-3"
-          >
-            Cash Flow Statement
-          </button>
-        </div>
+      <div className="row">
+        <div className="col-xl-8 col-lg-5 d-flex justify-contenbt-between">
+          <DropdownMenu
+            options={statementDisplayTextArray}
+            fn={displayFinancialStatement}
+          ></DropdownMenu>
 
-        <div>
-          <button
-            onClick={() => toggleIntervalType(TABLE_CONFIG.ANNUAL)}
-            className="btn btn-primary mb-3"
-          >
-            Annual
-          </button>
-          <button
-            onClick={() => toggleIntervalType(TABLE_CONFIG.QUARTERLY)}
-            className="btn btn-secondary mb-3"
-          >
-            Quarterly
-          </button>
-        </div>
+          <DropdownMenu
+            options={intervalTypeDisplayTextArray}
+            fn={toggleIntervalType}
+          ></DropdownMenu>
         </div>
       </div>
 
@@ -158,7 +138,6 @@ function StockInfo() {
                 : "Quarterly"
             })`}
           >
-
             {/* <Table /> */}
             <Table>
               <thead>

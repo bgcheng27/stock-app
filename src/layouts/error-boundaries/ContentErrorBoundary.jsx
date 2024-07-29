@@ -1,8 +1,7 @@
 import React from "react";
 import { ErrorPage } from "../../pages/ErrorPage";
 import { NotFound } from "../../pages/NotFound"
-import { HttpError } from "../../errors/HttpError";
-import { ERROR_MESSAGES } from "../../js/mockData";
+import { ERROR_MESSAGES, formatErrorMessage } from "../../js/mockData";
 
 export class ContentErrorBoundary extends React.Component {
   state = { hasError: false, error: null, errorInfo: null, message: null }
@@ -25,7 +24,7 @@ export class ContentErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       
-      if (this.state.message === ERROR_MESSAGES.UNDEFINED_SYMBOL) {
+      if (this.state.message === formatErrorMessage(ERROR_MESSAGES.SYMBOL_NOT_FOUND)) {
         return <NotFound />
       }
 

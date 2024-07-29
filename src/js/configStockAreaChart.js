@@ -1,62 +1,34 @@
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-} from "chart.js";
-import annotationPlugin from "chartjs-plugin-annotation";
 import { useEffect, useState } from "react";
 
-import { Line } from "react-chartjs-2";
-
-Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-Chart.defaults.global.defaultFontColor = '#858796';
-
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  annotationPlugin,
-);
-
-const LINE_COLOR = {
+export const LINE_COLOR = {
   SUCCESS: "28, 200, 138",
   DANGER: "231, 74, 59",
-  GRAY: "20, 20, 20"
-}
+  GRAY: "20, 20, 20",
+};
 
-const GRAPH_STYLES = {
+export const GRAPH_STYLES = {
   fill: true,
   pointHoverRadius: 3,
   pointRadius: 0,
   pointHitRadius: 10,
   pointBorderWidth: 2,
-}
+};
 
-const PREV_CLOSE_STYLES = {
+export const PREV_CLOSE_STYLES = {
   borderColor: `rgba(${LINE_COLOR.GRAY}, 0.8)`,
   borderDash: [5, 3],
   borderWidth: 1,
   pointRadius: 0,
-}
+};
 
-const TOOL_TIPS_STYLES = {
+export const TOOL_TIPS_STYLES = {
   mode: "single",
   backgroundColor: "rgb(255,255,255)",
   bodyColor: "#858796",
   titleMarginBottom: 5,
   titleColor: "#6e707e",
   titleFont: {
-    size: 14
+    size: 14,
   },
 
   borderColor: "#dddfeb",
@@ -66,20 +38,27 @@ const TOOL_TIPS_STYLES = {
   intersect: false,
   mode: "index",
   caretPadding: 10,
-}
+};
 
 
+// custom hook
+export function configStockAreaChart(config) {
+  const { xTimeLabels, xLabels, xData, xVolume, previousClose } = config;
 
-export function MyAreaChart({ xTimeLabels, xLabels, xData, xVolume, previousClose }) {
   const [lineColor, setLineColor] = useState(() => {
-    return xData[xData.length - 1] > previousClose ? LINE_COLOR.SUCCESS : LINE_COLOR.DANGER;
-  })
+    return xData[xData.length - 1] > previousClose
+      ? LINE_COLOR.SUCCESS
+      : LINE_COLOR.DANGER;
+  });
+
 
   useEffect(() => {
     setLineColor(() => {
-      return xData[xData.length - 1] > previousClose ? LINE_COLOR.SUCCESS : LINE_COLOR.DANGER;
-    })
-  }, [xData, previousClose])
+      return xData[xData.length - 1] > previousClose
+        ? LINE_COLOR.SUCCESS
+        : LINE_COLOR.DANGER;
+    });
+  }, [xData, previousClose]);
 
 
   const areaData = {
@@ -96,15 +75,16 @@ export function MyAreaChart({ xTimeLabels, xLabels, xData, xVolume, previousClos
         pointHoverBackgroundColor: `rgba(${lineColor}, 1)`,
         pointHoverBorderColor: `rgba(${lineColor}, 1)`,
 
-        data: xData
+        data: xData,
       },
       {
         ...PREV_CLOSE_STYLES,
         label: "Previous Close",
-        data: Array(xData.length).fill(previousClose)
+        data: Array(xData.length).fill(previousClose),
       },
     ],
   };
+
 
   const areaOptions = {
     animation: false,
@@ -117,23 +97,23 @@ export function MyAreaChart({ xTimeLabels, xLabels, xData, xVolume, previousClos
         bottom: 0,
       },
     },
-  
+
     scales: {
       x: {
         time: {
           unit: "datse",
         },
-  
+
         grid: {
           display: false,
           drawBorder: false,
         },
-  
+
         ticks: {
           maxTicksLimit: 7,
         },
       },
-  
+
       y: {
         ticks: {
           padding: 10,
@@ -141,46 +121,43 @@ export function MyAreaChart({ xTimeLabels, xLabels, xData, xVolume, previousClos
             return "$" + value.toFixed(2);
           },
         },
-  
+
         grid: {
           color: "rgb(234, 236, 244)",
           zeroLineColor: "rgb(234, 236, 244)",
           zeroLineBorderDash: [2],
         },
-        
+
         border: {
           display: false,
           dash: [2],
-        }
+        },
       },
     },
-  
+
     legend: {
       display: false,
     },
-  
+
     plugins: {
       tooltip: {
         ...TOOL_TIPS_STYLES,
         callbacks: {
-          label: _ => "",
+          label: (_) => "",
           title: (context) => {
             var price = context[0].raw;
-            return `USD $${price}`
+            return `USD $${price}`;
           },
           afterBody: (context) => {
-            return [`${xLabels[context[0].dataIndex]}`, `Volume: ${xVolume[context[0].dataIndex]}`]
-         },
+            return [
+              `${xLabels[context[0].dataIndex]}`,
+              `Volume: ${xVolume[context[0].dataIndex]}`,
+            ];
+          },
         },
       },
-    }
-  
-    
+    },
   };
 
-  return (
-    <div className="chart-area">
-      <Line options={areaOptions} data={areaData} />
-    </div>
-  );
+  return { areaData, areaOptions }
 }

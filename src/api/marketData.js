@@ -1,5 +1,6 @@
 import { baseApi } from "./baseApi";
 
+
 export function getTimeSeries(func, symbol, interval, extendedHours = "false", outputSize = "compact", options) {
   return baseApi.get(`/query?function=${func}&symbol=${symbol}&interval=${interval}&extendedHours=${extendedHours}&outputsize=${outputSize}&apikey=${import.meta.env.VITE_API_KEY_2}`, options).then(res => res.data)
 }

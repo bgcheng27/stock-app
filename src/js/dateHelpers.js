@@ -29,20 +29,16 @@ function padZeroes(number) {
 export function setIntradayArray(latestTradingDay, dataArray) {
   // TODO: check if market is open to determine trading day
 
-  console.log(latestTradingDay);
-
   let startIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 09:30:00`)
   let endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
 
   // if no start index: start slice at -100
   if (startIndex === -1) {
-    console.log("no start index")
     startIndex = -300;
   }
 
   // if no end index: just slice from the start index
   if (endIndex === -1) {
-    console.log("no end index")
     return dataArray.slice(startIndex)
   }
 
