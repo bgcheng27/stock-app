@@ -1,6 +1,5 @@
 import { financialsDemo, getFinancials } from "../../api/financials";
 import { getQuote, getQuoteDemo, getTimeSeries, getTimeSeriesDemo, getOverview, getOverviewDemo } from "../../api/marketData";
-import { ERROR_MESSAGES } from "../mockData"
 import { INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW } from "../data/financialsConfig"
 
 // maybe a custom hook
@@ -11,7 +10,8 @@ export async function fetchStockData(isDemo, signal, symbol) {
     marketData,
     quoteData,
     description,
-    expectedSymbol;
+    expectedSymbol,
+    lastRefreshDate;
 
   const GRAPH_INTERVAL = isDemo ? "5min" : "1min";
   
@@ -24,8 +24,6 @@ export async function fetchStockData(isDemo, signal, symbol) {
     marketData = await getTimeSeriesDemo({ signal });
     quoteData = await getQuoteDemo({ signal });
     description = await getOverviewDemo({ signal })
-
-    console.log(description)
   } else {
     incomeStatementData = getFinancials(
       INCOME_STATEMENT.apiCall,
@@ -56,6 +54,7 @@ export async function fetchStockData(isDemo, signal, symbol) {
 
   if (marketData["Meta Data"]) {
     expectedSymbol = marketData["Meta Data"]["2. Symbol"]
+    lastRefreshDate = marketData["Meta Data"]["3. Last Refreshed"].split(" ")[0]
   } else {
     expectedSymbol = undefined
   }
@@ -65,10 +64,10 @@ export async function fetchStockData(isDemo, signal, symbol) {
     incomeStatementData: await incomeStatementData,
     balanceSheetData: await balanceSheetData,
     cashFlowData: await cashFlowData,
-
     symbol: expectedSymbol,
     dataPoints: marketData[`Time Series (${GRAPH_INTERVAL})`],
     quoteData: quoteData["Global Quote"],
-    description: description["Description"]
+    description: description["Description"],
+    lastRefreshDate
   };
 }

@@ -43,11 +43,10 @@ function StockInfo() {
     dataPoints,
     quoteData,
     description,
+    lastRefreshDate,
     error,
   } = useLoaderData();
-
-  console.log(description)
-
+  
   if (incomeStatementData["Information"]) {
     throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
   }
@@ -63,7 +62,7 @@ function StockInfo() {
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
   const { volumeArray, openArray, dateTimeArray, timeLabels } =
-    useSortedMarketData(dataPoints, quoteData);
+    useSortedMarketData(dataPoints, lastRefreshDate);
 
   return (
     <>

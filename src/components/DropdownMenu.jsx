@@ -34,6 +34,7 @@ export function DropdownMenu({ color, options, fn }) {
         {options.map((option) => {
           return (
             <div
+              key={crypto.randomUUID()}
               onClick={(event) => {
                 fn(apiKeyVal[option])
                 setSelected(event.target.textContent)

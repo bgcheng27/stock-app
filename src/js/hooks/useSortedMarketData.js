@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { extractTime, formatDateTimeLabel, setIntradayArray } from "../dateHelpers";
 import { number_format, twoDecimal } from "../formatters";
 
-export function useSortedMarketData(dataPoints, quoteData) {
+export function useSortedMarketData(dataPoints, lastRefreshDate) {
   const sortedData = useMemo(() => {
     const initialData = Object.keys(dataPoints)
       .map((key) => {
@@ -16,8 +16,9 @@ export function useSortedMarketData(dataPoints, quoteData) {
         return new Date(a.dateTime) - new Date(b.dateTime);
       });
 
-    return setIntradayArray(quoteData["07. latest trading day"], initialData);
+    return setIntradayArray(lastRefreshDate, initialData);
   }, [dataPoints]);
+  
 
   const volumeArray = useMemo(() => {
     return sortedData.map((item) => {

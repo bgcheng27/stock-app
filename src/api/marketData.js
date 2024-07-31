@@ -15,7 +15,7 @@ export function getOverview(symbol, options) {
 
 // Demo
 export function getTimeSeriesDemo(options) {
-  return baseApi.get("/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=demo", options).then(res => res.data)
+  return baseApi.get("/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&outputsize=full&apikey=demo", options).then(res => res.data)
 }
 
 export function getQuoteDemo(options) {
