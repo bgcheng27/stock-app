@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { endsWithFullHour, extractTime, isFullHourDivisibleByThree } from "./dateHelpers";
 
 const LINE_COLOR = {
   SUCCESS: "28, 200, 138",
@@ -110,7 +111,11 @@ export function configStockAreaChart(config) {
         },
 
         ticks: {
-          maxTicksLimit: 7,
+          callback: (value, index) => {
+            let isolatedTime = extractTime(xLabels[index])
+            let hourBool = isFullHourDivisibleByThree(isolatedTime)
+            if (hourBool) return isolatedTime
+          }
         },
       },
 
