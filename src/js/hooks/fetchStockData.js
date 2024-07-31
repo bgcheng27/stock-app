@@ -1,13 +1,9 @@
-import { financialsDemo, getFinancials } from "../../api/financials";
+import { financialsDemo } from "../../api/financials";
 import {
-  getQuote,
   getQuoteDemo,
-  getTimeSeries,
   getTimeSeriesDemo,
-  getOverview,
   getOverviewDemo,
 } from "../../api/marketData";
-import { ERROR_MESSAGES } from "../mockData";
 import {
   INCOME_STATEMENT,
   BALANCE_SHEET,
@@ -15,9 +11,7 @@ import {
 } from "../data/financialsConfig";
 
 // maybe a custom hook
-export async function fetchStockData(isDemo, signal, symbol) {
-  const GRAPH_INTERVAL = isDemo ? "5min" : "1min";
-
+export async function fetchStockData(signal, symbol) {
   let incomeStatementData = financialsDemo(INCOME_STATEMENT.apiCall, {
     signal,
   });
@@ -33,7 +27,7 @@ export async function fetchStockData(isDemo, signal, symbol) {
     cashFlowData: await cashFlowData,
 
     symbol,
-    dataPoints: marketData[`Time Series (${GRAPH_INTERVAL})`],
+    dataPoints: marketData[`Time Series (5min)`],
     quoteData: quoteData["Global Quote"],
     description: description["Description"],
   };

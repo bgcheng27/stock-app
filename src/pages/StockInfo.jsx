@@ -30,9 +30,9 @@ import {
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
 import { ERROR_MESSAGES } from "../js/mockData";
+import { DropdownCard } from "../components/card-components/DropdownCard";
 
 const NUM_INTERVALS = 3;
-const IS_DEMO = true;
 
 function StockInfo() {
   const {
@@ -192,7 +192,7 @@ function StockInfo() {
 
 async function loader({ request: { signal }, params: { symbol } }) {
   try {
-    return fetchStockData(IS_DEMO, signal, symbol);
+    return fetchStockData(signal, symbol);
   } catch (error) {
     return { error: error.message };
   }
