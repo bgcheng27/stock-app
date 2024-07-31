@@ -134,3 +134,31 @@ export function extractTime(dateTimeStr) {
   // Returning the matched time
   return timeMatch ? timeMatch[0] : null;
 }
+
+
+export function endsWithFullHour(timeString) {
+  // Check if the time ends with ":00" before the AM/PM part
+  return timeString.includes(":00") && timeString.split(":")[1].startsWith("00");
+}
+
+export function isFullHourDivisibleByThree(timeString) {
+  // Check if the time ends with ":00"
+  if (endsWithFullHour(timeString)) {
+    // Extract the hour part from the time string
+    let hourPart = timeString.split(":")[0];
+    let period = timeString.slice(-2); // AM or PM
+
+    // Convert the hour to a 24-hour format integer
+    let hour = parseInt(hourPart, 10);
+    if (period === "PM" && hour !== 12) {
+      hour += 12;
+    }
+    if (period === "AM" && hour === 12) {
+      hour = 0;
+    }
+
+    // Check if the hour is divisible by 3
+    return hour % 3 === 0;
+  }
+  return false;
+}
