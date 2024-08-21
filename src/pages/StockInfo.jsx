@@ -16,7 +16,9 @@ import { useLoaderData } from "react-router-dom";
 import {
   camelize,
   formatDateForTable,
+  formatKMBT,
   number_format,
+  toPercentValue,
   twoDecimal,
 } from "../js/formatters";
 import { StockAreaChart } from "../components/chart-components/StockAreaChart";
@@ -30,6 +32,8 @@ import {
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
 import { ERROR_MESSAGES } from "../js/mockData";
+import { formatDateTimeLabel } from "../js/dateHelpers";
+import { OverviewRow } from "../components/OverviewRow";
 
 const NUM_INTERVALS = 3;
 const IS_DEMO = true;
@@ -43,10 +47,22 @@ function StockInfo() {
     dataPoints,
     quoteData,
     description,
+    companyName,
+    overview,
     lastRefreshDate,
+    lastRefreshFull,
     error,
   } = useLoaderData();
-  
+
+  const {
+    PERatio: peRatio,
+    MarketCapitalization: marketCap,
+    DividendYield: dividendYield,
+    Exchange: primaryExchange,
+  } = overview;
+
+  console.log(peRatio, marketCap, dividendYield, primaryExchange);
+
   if (incomeStatementData["Information"]) {
     throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
   }
@@ -66,13 +82,16 @@ function StockInfo() {
 
   return (
     <>
-      <h1 className="h3 mb-0 text-gray-800 mb-4">{symbol}</h1>
+      <h1 className="h3 mb-1 text-gray-800">
+        {companyName} ({symbol})
+      </h1>
+      <p>Last Closing: {formatDateTimeLabel(lastRefreshFull)}</p>
 
       {/* Area Chart */}
       <div className="row">
         <div className="col-xl-8 col-lg-6">
           {/* Stock Area Chart */}
-          <BasicCard title={symbol}>
+          <BasicCard title="1D" styleClasses="chart-padding">
             <StockAreaChart
               config={{
                 xTimeLabels: timeLabels,
@@ -88,28 +107,28 @@ function StockInfo() {
         {/* Stock Info: (Open, Close, High, etc.) */}
         <div className="col-xl-4 col-lg-6">
           <BasicCard title="Quote">
-            <div className="d-flex justify-content-between">
-              <span>Previous Close:</span>
-              <span>${twoDecimal(quoteData["08. previous close"])}</span>
-            </div>
-
-            <div className="d-flex justify-content-between align-items-center">
-              <span>Open:</span>
-              <span>${twoDecimal(quoteData["02. open"])}</span>
-            </div>
-
-            <div className="d-flex justify-content-between">
-              <span>Day Range:</span>
-              <span>
-                ${twoDecimal(quoteData["04. low"])} - $
-                {twoDecimal(quoteData["03. high"])}
-              </span>
-            </div>
-
-            <div className="d-flex justify-content-between">
-              <span>Volume:</span>
-              <span>{number_format(quoteData["06. volume"])}</span>
-            </div>
+            <OverviewRow
+              label="Previous Close"
+              value={`$${twoDecimal(quoteData["08. previous close"])}`}
+            />
+            <OverviewRow
+              label="Open"
+              value={`$${twoDecimal(quoteData["02. open"])}`}
+            />
+            <OverviewRow
+              label="Day Range"
+              value={`$${twoDecimal(quoteData["04. low"])} - $${twoDecimal(
+                quoteData["03. high"]
+              )}`}
+            />
+            <OverviewRow
+              label="Volume"
+              value={number_format(quoteData["06. volume"])}
+            />
+            <OverviewRow label="Market Cap" value={formatKMBT(marketCap)} />
+            <OverviewRow label="P/E Ratio" value={peRatio} />
+            <OverviewRow label="Dividend Yield" value={`${toPercentValue(dividendYield)}%`} />
+            <OverviewRow label="Primary Exchange" value={primaryExchange} />
           </BasicCard>
         </div>
       </div>
@@ -179,9 +198,12 @@ function StockInfo() {
             </Table>
           </BasicCard>
         </div>
-        <div className="col-xl-4 col-lg-2">
+        <div className="col-xl-4 col-lg-6">
           <BasicCard title="About">
-            <p>{description} <a href={`https://en.wikipedia.org/wiki/${symbol}`}>Wikipedia</a></p>
+            <p>
+              {description}{" "}
+              <a href={`https://en.wikipedia.org/wiki/${symbol}`}>Wikipedia</a>
+            </p>
           </BasicCard>
         </div>
       </div>
