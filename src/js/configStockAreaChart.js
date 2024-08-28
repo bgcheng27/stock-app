@@ -47,17 +47,28 @@ export function configStockAreaChart(config) {
   const { xTimeLabels, xLabels, xData, xVolume, previousClose } = config;
 
   const [lineColor, setLineColor] = useState(() => {
-    return xData[xData.length - 1] > previousClose
+    console.log(previousClose)
+    if (previousClose !== undefined) {
+      console.log(previousClose !== undefined)
+      return xData[xData.length - 1] > previousClose
       ? LINE_COLOR.SUCCESS
       : LINE_COLOR.DANGER;
+    } else {
+      return LINE_COLOR.SUCCESS
+    }
   });
 
 
   useEffect(() => {
     setLineColor(() => {
-      return xData[xData.length - 1] > previousClose
+      if (previousClose !== undefined) {
+        console.log(previousClose !== undefined)
+        return xData[xData.length - 1] > previousClose
         ? LINE_COLOR.SUCCESS
         : LINE_COLOR.DANGER;
+      } else {
+        return LINE_COLOR.SUCCESS
+      }
     });
   }, [xData, previousClose]);
 
@@ -78,11 +89,13 @@ export function configStockAreaChart(config) {
 
         data: xData,
       },
-      {
+      ... (previousClose !== undefined)
+      ? 
+      [{
         ...PREV_CLOSE_STYLES,
         label: "Previous Close",
         data: Array(xData.length).fill(previousClose),
-      },
+      }] : [],
     ],
   };
 

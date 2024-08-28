@@ -26,23 +26,60 @@ function padZeroes(number) {
   return (number < 10 ? '0' : '') + number;
 }
 
-export function setIntradayArray(latestTradingDay, dataArray) {
+// MODIFY THIS.
+// add argument: interval which can be 1D, 1W, 1M, 1Y
+
+
+export function setIntradayArray(latestTradingDay, dataArray, interval) {
   // TODO: check if market is open to determine trading day
 
-  let startIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 09:30:00`)
-  let endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
+  let startIndex, endIndex;
 
-  // if no start index: start slice at -100
-  if (startIndex === -1) {
-    startIndex = -300;
+  // may need a useContext for the interval
+
+
+  if (interval === "1W") {
+    startIndex = dataArray.findIndex(data => data.dateTime === `2024-08-19 09:30:00`)
+    endIndex = dataArray.findIndex(data => data.dateTime === `2024-08-23 16:00:00`)
+    const roll = dataArray.slice(startIndex, endIndex + 1)
+
+    // only do this if "1W"
+    const cole = roll.filter((item) => {
+      const time = item.dateTime.split(" ")[1]
+      const minute = time.split(":")[1]
+
+      if (minute === "30" || minute === "00") {
+        return item;
+      }
+    })
+
+    return cole;
+
+
+  } else if (interval === "1M") {
+    startIndex = dataArray.findIndex(data => data.dateTime === `2024-08-01 09:30:00`)
+    endIndex = dataArray.findIndex(data => data.dateTime === `2024-08-23 16:00:00`)
+
+    const john = dataArray.slice(startIndex, endIndex + 1)
+
+    const ron = john.filter((item) => {
+      const time = item.dateTime.split(" ")[1]
+
+      if (time === "16:00:00") {
+        return item ;
+      }
+    })
+
+    return ron;
+
+  } else {
+    startIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 09:30:00`)
+    endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
+    
+
+    return dataArray.slice(startIndex, endIndex + 1)
   }
 
-  // if no end index: just slice from the start index
-  if (endIndex === -1) {
-    return dataArray.slice(startIndex)
-  }
-
-  return dataArray.slice(startIndex, endIndex + 1)
 }
 
 

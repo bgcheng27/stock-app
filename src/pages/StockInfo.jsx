@@ -32,8 +32,9 @@ import {
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
 import { ERROR_MESSAGES } from "../js/mockData";
-import { formatDateTimeLabel } from "../js/dateHelpers";
+import { formatDateTimeLabel, setIntradayArray } from "../js/dateHelpers";
 import { OverviewRow } from "../components/OverviewRow";
+import { useMemo, useState } from "react";
 
 const NUM_INTERVALS = 3;
 const IS_DEMO = true;
@@ -61,8 +62,6 @@ function StockInfo() {
     Exchange: primaryExchange,
   } = overview;
 
-  console.log(peRatio, marketCap, dividendYield, primaryExchange);
-
   if (incomeStatementData["Information"]) {
     throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
   }
@@ -75,10 +74,39 @@ function StockInfo() {
     throw new Error(error);
   }
 
+
+  const sortedData = useMemo(() => {
+    const initialData = Object.keys(dataPoints)
+      .map((key) => {
+        return {
+          dateTime: key,
+          open: twoDecimal(dataPoints[key]["1. open"]),
+          volume: number_format(dataPoints[key]["5. volume"]),
+        };
+      })
+      .sort((a, b) => {
+        return new Date(a.dateTime) - new Date(b.dateTime);
+      });
+
+    return initialData
+
+  }, [dataPoints]);
+
+  const oneDayArray = setIntradayArray(lastRefreshDate, sortedData, "1D");
+  const oneWeekArray = setIntradayArray("2024-08-19", sortedData, "1W")
+  const oneMonthArray = setIntradayArray("2024-08-01", sortedData, "1M")
+
+
+  const [arr, setArr] = useState(oneDayArray)
+  const [prevCloseState, setPrevCloseState] = useState(quoteData["08. previous close"])
+
+
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
+
   const { volumeArray, openArray, dateTimeArray, timeLabels } =
-    useSortedMarketData(dataPoints, lastRefreshDate);
+    useSortedMarketData(arr);
+
 
   return (
     <>
@@ -86,6 +114,27 @@ function StockInfo() {
         {companyName} ({symbol})
       </h1>
       <p>Last Closing: {formatDateTimeLabel(lastRefreshFull)}</p>
+
+      <button
+        onClick={() => {
+          setArr(oneDayArray)
+          setPrevCloseState(quoteData["08. previous close"])
+        }}
+        className="btn btn-primary"
+      >
+        1D
+      </button>
+      <button onClick={() => { 
+        setArr(oneWeekArray) 
+        setPrevCloseState(undefined)
+        
+        }} className="btn btn-danger">
+        1W
+      </button>
+      <button onClick={() => setArr(oneMonthArray)} className="btn btn-success">1M</button>
+      <button className="btn btn-warning">1Y</button>
+
+
 
       {/* Area Chart */}
       <div className="row">
@@ -98,7 +147,7 @@ function StockInfo() {
                 xLabels: dateTimeArray,
                 xData: openArray,
                 xVolume: volumeArray,
-                previousClose: quoteData["08. previous close"],
+                previousClose: prevCloseState
               }}
             />
           </BasicCard>
@@ -127,7 +176,10 @@ function StockInfo() {
             />
             <OverviewRow label="Market Cap" value={formatKMBT(marketCap)} />
             <OverviewRow label="P/E Ratio" value={peRatio} />
-            <OverviewRow label="Dividend Yield" value={`${toPercentValue(dividendYield)}%`} />
+            <OverviewRow
+              label="Dividend Yield"
+              value={`${toPercentValue(dividendYield)}%`}
+            />
             <OverviewRow label="Primary Exchange" value={primaryExchange} />
           </BasicCard>
         </div>
