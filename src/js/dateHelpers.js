@@ -1,3 +1,5 @@
+import { getIntervalStartDate } from "./newDateHelpers";
+
 export function formatDateForIntradayRange(date) {
   // Adjust for Eastern Time Zone (EST)
   var estOffset = -5 * 60; // Eastern Standard Time is UTC-5
@@ -33,14 +35,17 @@ function padZeroes(number) {
 export function setIntradayArray(latestTradingDay, dataArray, interval) {
   // TODO: check if market is open to determine trading day
 
-  let startIndex, endIndex;
+  let startDate, startIndex, endIndex;
 
   // may need a useContext for the interval
 
 
   if (interval === "1W") {
-    startIndex = dataArray.findIndex(data => data.dateTime === `2024-08-19 09:30:00`)
-    endIndex = dataArray.findIndex(data => data.dateTime === `2024-08-23 16:00:00`)
+    startDate = getIntervalStartDate(dataArray, 5);
+    console.log(startDate)
+    startIndex = dataArray.findIndex(data => data.dateTime === `2024-08-27 09:30:00`)
+    console.log(latestTradingDay)
+    endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
     const roll = dataArray.slice(startIndex, endIndex + 1)
 
     // only do this if "1W"
@@ -57,8 +62,9 @@ export function setIntradayArray(latestTradingDay, dataArray, interval) {
 
 
   } else if (interval === "1M") {
-    startIndex = dataArray.findIndex(data => data.dateTime === `2024-08-01 09:30:00`)
-    endIndex = dataArray.findIndex(data => data.dateTime === `2024-08-23 16:00:00`)
+    startDate = getIntervalStartDate(dataArray, 30);
+    startIndex = dataArray.findIndex(data => data.dateTime === `${startDate} 16:00:00`)
+    endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
 
     const john = dataArray.slice(startIndex, endIndex + 1)
 

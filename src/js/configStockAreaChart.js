@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { endsWithFullHour, extractTime, isFullHourDivisibleByThree } from "./dateHelpers";
+import {
+  endsWithFullHour,
+  extractTime,
+  isFullHourDivisibleByThree,
+} from "./dateHelpers";
 
 const LINE_COLOR = {
   SUCCESS: "28, 200, 138",
@@ -41,37 +45,31 @@ const TOOL_TIPS_STYLES = {
   caretPadding: 10,
 };
 
+function configLineColor(previousClose, xData) {
+  if (previousClose !== undefined) {
+    return xData[xData.length - 1] > previousClose
+      ? LINE_COLOR.SUCCESS
+      : LINE_COLOR.DANGER;
+  } else {
+    return xData[xData.length - 1] > xData[0]
+      ? LINE_COLOR.SUCCESS
+      : LINE_COLOR.DANGER 
+  }
+}
 
 // custom hook
 export function configStockAreaChart(config) {
   const { xTimeLabels, xLabels, xData, xVolume, previousClose } = config;
 
   const [lineColor, setLineColor] = useState(() => {
-    console.log(previousClose)
-    if (previousClose !== undefined) {
-      console.log(previousClose !== undefined)
-      return xData[xData.length - 1] > previousClose
-      ? LINE_COLOR.SUCCESS
-      : LINE_COLOR.DANGER;
-    } else {
-      return LINE_COLOR.SUCCESS
-    }
+    return configLineColor(previousClose, xData)
   });
-
 
   useEffect(() => {
     setLineColor(() => {
-      if (previousClose !== undefined) {
-        console.log(previousClose !== undefined)
-        return xData[xData.length - 1] > previousClose
-        ? LINE_COLOR.SUCCESS
-        : LINE_COLOR.DANGER;
-      } else {
-        return LINE_COLOR.SUCCESS
-      }
+      return configLineColor(previousClose, xData)
     });
   }, [xData, previousClose]);
-
 
   const areaData = {
     labels: xTimeLabels,
@@ -89,16 +87,17 @@ export function configStockAreaChart(config) {
 
         data: xData,
       },
-      ... (previousClose !== undefined)
-      ? 
-      [{
-        ...PREV_CLOSE_STYLES,
-        label: "Previous Close",
-        data: Array(xData.length).fill(previousClose),
-      }] : [],
+      ...(previousClose !== undefined
+        ? [
+            {
+              ...PREV_CLOSE_STYLES,
+              label: "Previous Close",
+              data: Array(xData.length).fill(previousClose),
+            },
+          ]
+        : []),
     ],
   };
-
 
   const areaOptions = {
     animation: false,
@@ -125,10 +124,10 @@ export function configStockAreaChart(config) {
 
         ticks: {
           callback: (value, index) => {
-            let isolatedTime = extractTime(xLabels[index])
-            let hourBool = isFullHourDivisibleByThree(isolatedTime)
-            if (hourBool) return isolatedTime
-          }
+            let isolatedTime = extractTime(xLabels[index]);
+            let hourBool = isFullHourDivisibleByThree(isolatedTime);
+            if (hourBool) return isolatedTime;
+          },
         },
       },
 
@@ -177,5 +176,5 @@ export function configStockAreaChart(config) {
     },
   };
 
-  return { areaData, areaOptions }
+  return { areaData, areaOptions };
 }

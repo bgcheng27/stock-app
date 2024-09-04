@@ -32,9 +32,10 @@ import {
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
 import { ERROR_MESSAGES } from "../js/mockData";
-import { formatDateTimeLabel, setIntradayArray } from "../js/dateHelpers";
+import { formatDateTimeLabel } from "../js/dateHelpers";
 import { OverviewRow } from "../components/OverviewRow";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
 
 const NUM_INTERVALS = 3;
 const IS_DEMO = true;
@@ -74,31 +75,13 @@ function StockInfo() {
     throw new Error(error);
   }
 
-
-  const sortedData = useMemo(() => {
-    const initialData = Object.keys(dataPoints)
-      .map((key) => {
-        return {
-          dateTime: key,
-          open: twoDecimal(dataPoints[key]["1. open"]),
-          volume: number_format(dataPoints[key]["5. volume"]),
-        };
-      })
-      .sort((a, b) => {
-        return new Date(a.dateTime) - new Date(b.dateTime);
-      });
-
-    return initialData
-
-  }, [dataPoints]);
-
-  const oneDayArray = setIntradayArray(lastRefreshDate, sortedData, "1D");
-  const oneWeekArray = setIntradayArray("2024-08-19", sortedData, "1W")
-  const oneMonthArray = setIntradayArray("2024-08-01", sortedData, "1M")
+  const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
+  console.log(dataPoints)
 
 
   const [arr, setArr] = useState(oneDayArray)
   const [prevCloseState, setPrevCloseState] = useState(quoteData["08. previous close"])
+  const [intervalText, setIntervalText] = useState("1D")
 
 
   const { financials, toggleIntervalType, displayFinancialStatement } =
@@ -119,20 +102,19 @@ function StockInfo() {
         onClick={() => {
           setArr(oneDayArray)
           setPrevCloseState(quoteData["08. previous close"])
+          setIntervalText("1D")
         }}
-        className="btn btn-primary"
-      >
-        1D
-      </button>
+        className="btn btn-primary">1D</button>
       <button onClick={() => { 
         setArr(oneWeekArray) 
         setPrevCloseState(undefined)
-        
-        }} className="btn btn-danger">
-        1W
-      </button>
-      <button onClick={() => setArr(oneMonthArray)} className="btn btn-success">1M</button>
-      <button className="btn btn-warning">1Y</button>
+        setIntervalText("1W")
+        }} className="btn btn-danger">1W</button>
+      <button onClick={() => {
+        setArr(oneMonthArray)
+        setPrevCloseState(undefined)
+        setIntervalText("1M")
+      }} className="btn btn-success">1M</button>
 
 
 
@@ -140,7 +122,7 @@ function StockInfo() {
       <div className="row">
         <div className="col-xl-8 col-lg-6">
           {/* Stock Area Chart */}
-          <BasicCard title="1D" styleClasses="chart-padding">
+          <BasicCard title={intervalText} styleClasses="chart-padding">
             <StockAreaChart
               config={{
                 xTimeLabels: timeLabels,
