@@ -34,25 +34,12 @@ import {
 import { ERROR_MESSAGES } from "../js/mockData";
 import { formatDateTimeLabel } from "../js/dateHelpers";
 import { OverviewRow } from "../components/OverviewRow";
-import { useReducer } from "react";
+import { useState } from "react";
 import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
 
 const NUM_INTERVALS = 3;
 const IS_DEMO = true;
 
-function graphReducer(graph, { type, payload}) {
-  switch (type) {
-    case "1D":
-      return {...graph, array: payload.array, prevClose: payload.prevClose, text: type};
-    case "1W":
-      return {...graph, array: payload.array, prevClose: undefined, text: type};
-    case "1M":
-      return {...graph, array: payload.array, prevClose: undefined, text: type}
-    default:
-      return graph
-
-  }
-}
 
 function StockInfo() {
   const {
@@ -90,7 +77,8 @@ function StockInfo() {
   }
 
   const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
-  const [graph, dispatch] = useReducer(graphReducer, { array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"})
+  const [graph, setGraph2] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"})
+
 
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
@@ -108,14 +96,20 @@ function StockInfo() {
 
       <button
         onClick={() => {
-          dispatch({ type: "1D", payload: { array: oneDayArray, prevClose: quoteData["08. previous close"] } })
+          setGraph2((prev) => {
+            return {...prev, array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"}
+          })
         }}
         className="btn btn-primary">1D</button>
       <button onClick={() => { 
-        dispatch({ type: "1W", payload: { array: oneWeekArray }})
+        setGraph2((prev) => {
+          return {...prev, array: oneWeekArray, prevClose: undefined, text: "1W"}
+        })
         }} className="btn btn-danger">1W</button>
       <button onClick={() => {
-        dispatch({ type: "1M", payload: { array: oneMonthArray }})
+        setGraph2((prev) => {
+          return {...prev, array: oneMonthArray, prevClose: undefined, text: "1M"}
+        })
       }} className="btn btn-success">1M</button>
 
 
