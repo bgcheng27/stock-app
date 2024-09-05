@@ -63,7 +63,7 @@ export function setIntradayArray(latestTradingDay, dataArray, interval) {
 
   } else if (interval === "1M") {
     startDate = getIntervalStartDate(dataArray, 30);
-    startIndex = dataArray.findIndex(data => data.dateTime === `${startDate} 16:00:00`)
+    startIndex = dataArray.findIndex(data => data.dateTime === `${startDate} 09:30:00`)
     endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
 
     const john = dataArray.slice(startIndex, endIndex + 1)
@@ -71,7 +71,7 @@ export function setIntradayArray(latestTradingDay, dataArray, interval) {
     const ron = john.filter((item) => {
       const time = item.dateTime.split(" ")[1]
 
-      if (time === "16:00:00") {
+      if (time === "09:30:00") {
         return item ;
       }
     })

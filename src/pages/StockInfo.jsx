@@ -34,11 +34,25 @@ import {
 import { ERROR_MESSAGES } from "../js/mockData";
 import { formatDateTimeLabel } from "../js/dateHelpers";
 import { OverviewRow } from "../components/OverviewRow";
-import { useState } from "react";
+import { useReducer } from "react";
 import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
 
 const NUM_INTERVALS = 3;
 const IS_DEMO = true;
+
+function graphReducer(graph, { type, payload}) {
+  switch (type) {
+    case "1D":
+      return {...graph, array: payload.array, prevClose: payload.prevClose, text: type};
+    case "1W":
+      return {...graph, array: payload.array, prevClose: undefined, text: type};
+    case "1M":
+      return {...graph, array: payload.array, prevClose: undefined, text: type}
+    default:
+      return graph
+
+  }
+}
 
 function StockInfo() {
   const {
@@ -76,19 +90,13 @@ function StockInfo() {
   }
 
   const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
-  console.log(dataPoints)
-
-
-  const [arr, setArr] = useState(oneDayArray)
-  const [prevCloseState, setPrevCloseState] = useState(quoteData["08. previous close"])
-  const [intervalText, setIntervalText] = useState("1D")
-
+  const [graph, dispatch] = useReducer(graphReducer, { array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"})
 
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
 
   const { volumeArray, openArray, dateTimeArray, timeLabels } =
-    useSortedMarketData(arr);
+    useSortedMarketData(graph.array);
 
 
   return (
@@ -100,20 +108,14 @@ function StockInfo() {
 
       <button
         onClick={() => {
-          setArr(oneDayArray)
-          setPrevCloseState(quoteData["08. previous close"])
-          setIntervalText("1D")
+          dispatch({ type: "1D", payload: { array: oneDayArray, prevClose: quoteData["08. previous close"] } })
         }}
         className="btn btn-primary">1D</button>
       <button onClick={() => { 
-        setArr(oneWeekArray) 
-        setPrevCloseState(undefined)
-        setIntervalText("1W")
+        dispatch({ type: "1W", payload: { array: oneWeekArray }})
         }} className="btn btn-danger">1W</button>
       <button onClick={() => {
-        setArr(oneMonthArray)
-        setPrevCloseState(undefined)
-        setIntervalText("1M")
+        dispatch({ type: "1M", payload: { array: oneMonthArray }})
       }} className="btn btn-success">1M</button>
 
 
@@ -122,15 +124,16 @@ function StockInfo() {
       <div className="row">
         <div className="col-xl-8 col-lg-6">
           {/* Stock Area Chart */}
-          <BasicCard title={intervalText} styleClasses="chart-padding">
+          <BasicCard title={graph.text} styleClasses="chart-padding">
             <StockAreaChart
               config={{
                 xTimeLabels: timeLabels,
                 xLabels: dateTimeArray,
                 xData: openArray,
                 xVolume: volumeArray,
-                previousClose: prevCloseState
+                previousClose: graph.prevClose
               }}
+              intervalText={graph.text}
             />
           </BasicCard>
         </div>

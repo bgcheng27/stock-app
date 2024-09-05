@@ -29,8 +29,8 @@ ChartJS.register(
 );
 
 
-export function StockAreaChart({ config }) {
-  const {areaData, areaOptions} = configStockAreaChart(config)
+export function StockAreaChart({ config, intervalText }) {
+  const {areaData, areaOptions} = configStockAreaChart(config, intervalText)
 
   return (
     <div className="chart-area">

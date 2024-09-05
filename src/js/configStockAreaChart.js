@@ -58,8 +58,9 @@ function configLineColor(previousClose, xData) {
 }
 
 // custom hook
-export function configStockAreaChart(config) {
+export function configStockAreaChart(config, intervalText) {
   const { xTimeLabels, xLabels, xData, xVolume, previousClose } = config;
+  console.log(xLabels)
 
   const [lineColor, setLineColor] = useState(() => {
     return configLineColor(previousClose, xData)
@@ -124,9 +125,32 @@ export function configStockAreaChart(config) {
 
         ticks: {
           callback: (value, index) => {
-            let isolatedTime = extractTime(xLabels[index]);
-            let hourBool = isFullHourDivisibleByThree(isolatedTime);
-            if (hourBool) return isolatedTime;
+            switch (intervalText) {
+              case "1D":
+                let isolatedTime = extractTime(xLabels[index]);
+                let hourBool = isFullHourDivisibleByThree(isolatedTime);
+                if (hourBool) return isolatedTime;
+                break;
+              case "1W":
+                let wDate = xLabels[index].split(",")[0];
+                let wTime = xLabels[index].split(" ")[2];
+                if (wTime === "9:30AM" && index !== 0) return wDate;
+                break;
+              case "1M":
+                let mDate = xLabels[index].split(",")[0];
+                let mTime = xLabels[index].split(" ")[2];
+                if (mTime === "9:30AM" && index !== 0) {
+                  let prevDate = xLabels[index - 1].split(",")[0];
+                  let prevDateObj = new Date(prevDate);
+                  let currDateObj = new Date(mDate);
+
+                  // Check if the current day is a Monday and the previous trading day was more than one day ago
+                  if ((currDateObj - prevDateObj) > 24 * 60 * 60 * 1000) {
+                    return mDate;
+                  }
+                }
+                break;
+            }
           },
         },
       },
