@@ -1,5 +1,3 @@
-import { getIntervalStartDate } from "./newDateHelpers";
-
 export function formatDateForIntradayRange(date) {
   // Adjust for Eastern Time Zone (EST)
   var estOffset = -5 * 60; // Eastern Standard Time is UTC-5
@@ -26,66 +24,6 @@ export function formatDateForIntradayRange(date) {
 
 function padZeroes(number) {
   return (number < 10 ? '0' : '') + number;
-}
-
-// MODIFY THIS.
-// add argument: interval which can be 1D, 1W, 1M, 1Y
-
-
-export function setIntradayArray(latestTradingDay, dataArray, interval) {
-  // TODO: check if market is open to determine trading day
-
-  let startDate, startIndex, endIndex;
-
-  // may need a useContext for the interval
-
-
-  if (interval === "1W") {
-    startDate = getIntervalStartDate(dataArray, 5);
-    console.log(startDate)
-    startIndex = dataArray.findIndex(data => data.dateTime === `2024-08-27 09:30:00`)
-    console.log(latestTradingDay)
-    endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
-    const roll = dataArray.slice(startIndex, endIndex + 1)
-
-    // only do this if "1W"
-    const cole = roll.filter((item) => {
-      const time = item.dateTime.split(" ")[1]
-      const minute = time.split(":")[1]
-
-      if (minute === "30" || minute === "00") {
-        return item;
-      }
-    })
-
-    return cole;
-
-
-  } else if (interval === "1M") {
-    startDate = getIntervalStartDate(dataArray, 30);
-    startIndex = dataArray.findIndex(data => data.dateTime === `${startDate} 09:30:00`)
-    endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
-
-    const john = dataArray.slice(startIndex, endIndex + 1)
-
-    const ron = john.filter((item) => {
-      const time = item.dateTime.split(" ")[1]
-
-      if (time === "09:30:00") {
-        return item ;
-      }
-    })
-
-    return ron;
-
-  } else {
-    startIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 09:30:00`)
-    endIndex = dataArray.findIndex(data => data.dateTime === `${latestTradingDay} 16:00:00`)
-    
-
-    return dataArray.slice(startIndex, endIndex + 1)
-  }
-
 }
 
 

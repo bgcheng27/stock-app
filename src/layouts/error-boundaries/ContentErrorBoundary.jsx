@@ -1,7 +1,7 @@
 import React from "react";
 import { ErrorPage } from "../../pages/ErrorPage";
 import { NotFound } from "../../pages/NotFound"
-import { ERROR_MESSAGES, formatErrorMessage } from "../../js/mockData";
+import { ERROR_MESSAGES, formatErrorMessage } from "../../js/errorHandler";
 
 export class ContentErrorBoundary extends React.Component {
   state = { hasError: false, error: null, errorInfo: null, message: null }

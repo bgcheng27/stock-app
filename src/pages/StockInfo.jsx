@@ -31,7 +31,7 @@ import {
   intervalTypeDisplayTextArray,
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
-import { ERROR_MESSAGES } from "../js/mockData";
+import { ERROR_MESSAGES } from "../js/errorHandler";
 import { formatDateTimeLabel } from "../js/dateHelpers";
 import { OverviewRow } from "../components/OverviewRow";
 import { useState } from "react";

@@ -2,7 +2,7 @@ import { financialsDemo, getFinancials } from "../../api/financials";
 import { getQuote, getQuoteDemo, getTimeSeries, getTimeSeriesDemo, getOverview, getOverviewDemo } from "../../api/marketData";
 import { INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW } from "../data/financialsConfig"
 
-// maybe a custom hook
+
 export async function fetchStockData(isDemo, signal, symbol) {
   let incomeStatementData,
     balanceSheetData,

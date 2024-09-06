@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { extractTime, formatDateTimeLabel, setIntradayArray } from "../dateHelpers";
-import { number_format, twoDecimal } from "../formatters";
+import { extractTime, formatDateTimeLabel } from "../dateHelpers";
 
 
 export function useSortedMarketData(sortedData) {

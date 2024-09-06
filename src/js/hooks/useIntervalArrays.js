@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { setIntradayArray } from "../dateHelpers";
+import { setIntradayArray } from "../graphDateHelpers";
 import { number_format, twoDecimal } from "../formatters";
 
 export function useIntervalArrays(firstIndex, dataPoints) {

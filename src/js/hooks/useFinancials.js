@@ -1,5 +1,4 @@
 import { useReducer } from "react";
-
 import { INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW } from "../data/financialsConfig";
 
 

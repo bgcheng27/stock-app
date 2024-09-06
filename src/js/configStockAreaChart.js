@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  endsWithFullHour,
   extractTime,
   isFullHourDivisibleByThree,
 } from "./dateHelpers";
@@ -60,8 +59,6 @@ function configLineColor(previousClose, xData) {
 // custom hook
 export function configStockAreaChart(config, intervalText) {
   const { xTimeLabels, xLabels, xData, xVolume, previousClose } = config;
-  console.log(xLabels)
-
   const [lineColor, setLineColor] = useState(() => {
     return configLineColor(previousClose, xData)
   });
@@ -158,7 +155,7 @@ export function configStockAreaChart(config, intervalText) {
       y: {
         ticks: {
           padding: 10,
-          callback: (value, index, values) => {
+          callback: (value) => {
             return "$" + value.toFixed(2);
           },
         },
