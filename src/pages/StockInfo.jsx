@@ -77,7 +77,7 @@ function StockInfo() {
   }
 
   const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
-  const [graph, setGraph2] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"})
+  const [graph, setGraph] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"})
 
 
   const { financials, toggleIntervalType, displayFinancialStatement } =
@@ -96,18 +96,18 @@ function StockInfo() {
 
       <button
         onClick={() => {
-          setGraph2((prev) => {
+          setGraph((prev) => {
             return {...prev, array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"}
           })
         }}
         className="btn btn-primary">1D</button>
       <button onClick={() => { 
-        setGraph2((prev) => {
+        setGraph((prev) => {
           return {...prev, array: oneWeekArray, prevClose: undefined, text: "1W"}
         })
         }} className="btn btn-danger">1W</button>
       <button onClick={() => {
-        setGraph2((prev) => {
+        setGraph((prev) => {
           return {...prev, array: oneMonthArray, prevClose: undefined, text: "1M"}
         })
       }} className="btn btn-success">1M</button>

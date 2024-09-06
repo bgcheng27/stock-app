@@ -49,7 +49,7 @@ export function setIntradayArray(latestTradingDay, dataArray, interval) {
     return initialArray.filter((item) => {
       const time = item.dateTime.split(" ")[1]
 
-      if (time === "09:30:00") {
+      if (time === "16:00:00") {
         return item ;
       }
     })

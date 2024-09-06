@@ -136,7 +136,7 @@ export function configStockAreaChart(config, intervalText) {
               case "1M":
                 let mDate = xLabels[index].split(",")[0];
                 let mTime = xLabels[index].split(" ")[2];
-                if (mTime === "9:30AM" && index !== 0) {
+                if (mTime === "4:00PM" && index !== 0) {
                   let prevDate = xLabels[index - 1].split(",")[0];
                   let prevDateObj = new Date(prevDate);
                   let currDateObj = new Date(mDate);
