@@ -13,6 +13,7 @@ import { configStockAreaChart } from "../../js/configStockAreaChart";
 
 import { Line } from "react-chartjs-2";
 
+
 Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#858796';
 

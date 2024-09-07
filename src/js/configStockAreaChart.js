@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  extractTime,
+  convertToAMPM,
   isFullHourDivisibleByThree,
 } from "./dateHelpers";
+import { formatDateTimeLabel, formatMonthDay, getPropValue } from "./tooltipHelpers";
+import { useSortedMarketData } from "./hooks/useSortedMarketData";
 
 const LINE_COLOR = {
   SUCCESS: "28, 200, 138",
@@ -44,60 +46,7 @@ const TOOL_TIPS_STYLES = {
   caretPadding: 10,
 };
 
-function configLineColor(previousClose, xData) {
-  if (previousClose !== undefined) {
-    return xData[xData.length - 1] > previousClose
-      ? LINE_COLOR.SUCCESS
-      : LINE_COLOR.DANGER;
-  } else {
-    return xData[xData.length - 1] > xData[0]
-      ? LINE_COLOR.SUCCESS
-      : LINE_COLOR.DANGER 
-  }
-}
-
-// custom hook
-export function configStockAreaChart(config, intervalText) {
-  const { xTimeLabels, xLabels, xData, xVolume, previousClose } = config;
-  const [lineColor, setLineColor] = useState(() => {
-    return configLineColor(previousClose, xData)
-  });
-
-  useEffect(() => {
-    setLineColor(() => {
-      return configLineColor(previousClose, xData)
-    });
-  }, [xData, previousClose]);
-
-  const areaData = {
-    labels: xTimeLabels,
-    datasets: [
-      {
-        ...GRAPH_STYLES,
-        label: "Open",
-
-        backgroundColor: `rgba(${lineColor}, 0.15)`,
-        borderColor: `rgba(${lineColor}, 1)`,
-        pointBackgroundColor: `rgba(${lineColor}, 1)`,
-        pointBorderColor: `rgba(${lineColor}, 1)`,
-        pointHoverBackgroundColor: `rgba(${lineColor}, 1)`,
-        pointHoverBorderColor: `rgba(${lineColor}, 1)`,
-
-        data: xData,
-      },
-      ...(previousClose !== undefined
-        ? [
-            {
-              ...PREV_CLOSE_STYLES,
-              label: "Previous Close",
-              data: Array(xData.length).fill(previousClose),
-            },
-          ]
-        : []),
-    ],
-  };
-
-  const areaOptions = {
+const AREA_OPS = {
     animation: false,
     maintainAspectRatio: false,
     layout: {
@@ -109,41 +58,132 @@ export function configStockAreaChart(config, intervalText) {
       },
     },
 
+    legend: {
+      display: false,
+    },
+}
+
+const X_SCALES = {
+  time: {
+    unit: "datse",
+  },
+
+  grid: {
+    display: false,
+    drawBorder: false,
+  },
+}
+
+const Y_SCALES = {
+  grid: {
+    color: "rgb(234, 236, 244)",
+    zeroLineColor: "rgb(234, 236, 244)",
+    zeroLineBorderDash: [2],
+  },
+
+  border: {
+    display: false,
+    dash: [2],
+  },
+}
+
+
+function getLineColorData(lineColor) {
+  return {
+    backgroundColor: `rgba(${lineColor}, 0.15)`,
+    borderColor: `rgba(${lineColor}, 1)`,
+    pointBackgroundColor: `rgba(${lineColor}, 1)`,
+    pointBorderColor: `rgba(${lineColor}, 1)`,
+    pointHoverBackgroundColor: `rgba(${lineColor}, 1)`,
+    pointHoverBorderColor: `rgba(${lineColor}, 1)`,
+  }
+}
+
+function configLineColor(previousClose, openArray) {
+  if (previousClose !== undefined) {
+    return openArray[openArray.length - 1] > previousClose
+      ? LINE_COLOR.SUCCESS
+      : LINE_COLOR.DANGER;
+  } else {
+    return openArray[openArray.length - 1] > openArray[0]
+      ? LINE_COLOR.SUCCESS
+      : LINE_COLOR.DANGER 
+  }
+}
+
+
+export function configStockAreaChart(config, intervalText) {
+  const { graphArray, previousClose } = config;
+  const { timeLabels, openArray} = useSortedMarketData(graphArray)
+
+  const [lineColor, setLineColor] = useState(() => {
+    return configLineColor(previousClose, openArray)
+  });
+
+
+  useEffect(() => {
+    setLineColor(() => {
+      return configLineColor(previousClose, openArray)
+    });
+  }, [openArray, previousClose]);
+
+
+  const areaData = {
+    labels: timeLabels,
+    datasets: [
+      {
+        ...GRAPH_STYLES,
+        ...getLineColorData(lineColor),
+        label: "Open",
+        data: openArray,
+      },
+      ...(previousClose !== undefined
+        ? [
+            {
+              ...PREV_CLOSE_STYLES,
+              label: "Previous Close",
+              data: Array(openArray.length).fill(previousClose),
+            },
+          ]
+        : []),
+    ],
+  };
+
+  const areaOptions = {
+    ...AREA_OPS,
     scales: {
       x: {
-        time: {
-          unit: "datse",
-        },
-
-        grid: {
-          display: false,
-          drawBorder: false,
-        },
-
+        ...X_SCALES,
         ticks: {
-          callback: (value, index) => {
+          callback: (index) => {
             switch (intervalText) {
               case "1D":
-                let isolatedTime = extractTime(xLabels[index]);
+                let isoDateTime = getPropValue(graphArray, "dateTime", index)
+                let isolatedTime = convertToAMPM(isoDateTime.split(" ")[1]);
                 let hourBool = isFullHourDivisibleByThree(isolatedTime);
                 if (hourBool) return isolatedTime;
                 break;
               case "1W":
-                let wDate = xLabels[index].split(",")[0];
-                let wTime = xLabels[index].split(" ")[2];
-                if (wTime === "9:30AM" && index !== 0) return wDate;
+                let wDateTime = getPropValue(graphArray, "dateTime", index);
+                let wDate = wDateTime.split(" ")[0];
+                let wTime = wDateTime.split(" ")[1];
+                
+                if (wTime === "09:30:00" && index !== 0) return formatMonthDay(wDate);
                 break;
               case "1M":
-                let mDate = xLabels[index].split(",")[0];
-                let mTime = xLabels[index].split(" ")[2];
-                if (mTime === "4:00PM" && index !== 0) {
-                  let prevDate = xLabels[index - 1].split(",")[0];
+                let mDateTime = getPropValue(graphArray, "dateTime", index);
+                let mDate = mDateTime.split(" ")[0];
+                let mTime = mDateTime.split(" ")[1];
+
+                if (mTime === "16:00:00" && index !== 0) {
+                  let prevDateTime = getPropValue(graphArray, "dateTime", index - 1)
+                  let prevDate = prevDateTime.split(" ")[0];
                   let prevDateObj = new Date(prevDate);
                   let currDateObj = new Date(mDate);
 
                   // Check if the current day is a Monday and the previous trading day was more than one day ago
                   if ((currDateObj - prevDateObj) > 24 * 60 * 60 * 1000) {
-                    return mDate;
+                    return formatMonthDay(mDate);
                   }
                 }
                 break;
@@ -153,28 +193,14 @@ export function configStockAreaChart(config, intervalText) {
       },
 
       y: {
+        ...Y_SCALES,
         ticks: {
           padding: 10,
           callback: (value) => {
             return "$" + value.toFixed(2);
           },
         },
-
-        grid: {
-          color: "rgb(234, 236, 244)",
-          zeroLineColor: "rgb(234, 236, 244)",
-          zeroLineBorderDash: [2],
-        },
-
-        border: {
-          display: false,
-          dash: [2],
-        },
       },
-    },
-
-    legend: {
-      display: false,
     },
 
     plugins: {
@@ -188,8 +214,8 @@ export function configStockAreaChart(config, intervalText) {
           },
           afterBody: (context) => {
             return [
-              `${xLabels[context[0].dataIndex]}`,
-              `Volume: ${xVolume[context[0].dataIndex]}`,
+              `${formatDateTimeLabel(graphArray[context[0].dataIndex].dateTime)}`,
+              `Volume: ${graphArray[context[0].dataIndex].volume}`,
             ];
           },
         },

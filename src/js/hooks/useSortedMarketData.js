@@ -1,31 +1,21 @@
 import { useMemo } from "react";
-import { extractTime, formatDateTimeLabel } from "../dateHelpers";
+import { extractTime } from "../dateHelpers";
+import { formatDateTimeLabel } from "../tooltipHelpers";
 
 
 export function useSortedMarketData(sortedData) {
-  const volumeArray = useMemo(() => {
-    return sortedData.map((item) => {
-      return item.volume;
-    });
-  }, [sortedData]);
-
   const openArray = useMemo(() => {
     return sortedData.map((item) => {
       return item.open;
     });
   }, [sortedData]);
 
-  const dateTimeArray = useMemo(() => {
-    return sortedData.map((item) => {
-      return formatDateTimeLabel(item.dateTime);
-    });
-  }, [sortedData]);
-
   const timeLabels = useMemo(() => {
-    return dateTimeArray.map((dateTime) => {
+    return sortedData.map((item) => {
+      const dateTime = formatDateTimeLabel(item.dateTime);
       return extractTime(dateTime);
     });
-  }, [dateTimeArray]);
-
-  return { sortedData, volumeArray, openArray, dateTimeArray, timeLabels }
+  }, [sortedData]);
+  
+  return { sortedData, openArray, timeLabels }
 }

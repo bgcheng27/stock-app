@@ -24,7 +24,6 @@ import {
 import { StockAreaChart } from "../components/chart-components/StockAreaChart";
 
 import { fetchStockData } from "../js/hooks/fetchStockData";
-import { useSortedMarketData } from "../js/hooks/useSortedMarketData";
 import { useFinancials } from "../js/hooks/useFinancials";
 import { DropdownMenu } from "../components/DropdownMenu";
 import {
@@ -32,7 +31,7 @@ import {
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
 import { ERROR_MESSAGES } from "../js/errorHandler";
-import { formatDateTimeLabel } from "../js/dateHelpers";
+import { formatDateTimeLabel } from "../js/tooltipHelpers";
 import { OverviewRow } from "../components/OverviewRow";
 import { useState } from "react";
 import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
@@ -83,9 +82,6 @@ function StockInfo() {
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
 
-  const { volumeArray, openArray, dateTimeArray, timeLabels } =
-    useSortedMarketData(graph.array);
-
 
   return (
     <>
@@ -121,10 +117,7 @@ function StockInfo() {
           <BasicCard title={graph.text} styleClasses="chart-padding">
             <StockAreaChart
               config={{
-                xTimeLabels: timeLabels,
-                xLabels: dateTimeArray,
-                xData: openArray,
-                xVolume: volumeArray,
+                graphArray: graph.array,
                 previousClose: graph.prevClose
               }}
               intervalText={graph.text}
