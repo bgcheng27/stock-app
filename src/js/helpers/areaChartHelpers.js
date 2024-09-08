@@ -1,26 +1,5 @@
 import { useMemo } from "react";
 
-export function getIntervalStartDate(dataArray, daysAgo) {
-  const isoDateArray = useMemo(() => {
-    return dataArray.map((item) => {
-      return item.dateTime.split(" ")[0]
-    })
-  }, [dataArray])
-  
-  const uniqueDates = new Set();
-  
-  for (let i = isoDateArray.length - 1; i >= 0; i--) {
-    uniqueDates.add(isoDateArray[i]);
-
-    if (uniqueDates.size === daysAgo) {
-      return isoDateArray[i];
-    }
-  }
-
-  // in case we don't reach (1M will be on the margin), we just return the start of the array we received
-  return isoDateArray[0];
-}
-
 
 const INTERVAL_MAP = {
   "1D": 1,
@@ -58,3 +37,28 @@ export function setIntradayArray(latestTradingDay, dataArray, interval) {
   }
 
 }
+
+
+export function getIntervalStartDate(dataArray, daysAgo) {
+  const isoDateArray = useMemo(() => {
+    return dataArray.map((item) => {
+      return item.dateTime.split(" ")[0]
+    })
+  }, [dataArray])
+
+  
+  const uniqueDates = new Set();
+  
+  for (let i = isoDateArray.length - 1; i >= 0; i--) {
+    uniqueDates.add(isoDateArray[i]);
+
+    if (uniqueDates.size === daysAgo) {
+      return isoDateArray[i];
+    }
+  }
+
+  // in case we don't reach (1M will be on the margin), we just return the start of the array we received
+  return isoDateArray[0];
+}
+
+

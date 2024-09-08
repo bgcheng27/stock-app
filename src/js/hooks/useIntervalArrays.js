@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { setIntradayArray } from "../graphDateHelpers";
-import { number_format, twoDecimal } from "../formatters";
+import { setIntradayArray } from "../helpers/areaChartHelpers";
+import { number_format, twoDecimal } from "../helpers/numberHelpers";
 
-export function useIntervalArrays(firstIndex, dataPoints) {
+export function useIntervalArrays(lastTradingDay, dataPoints) {
   const sortedData = useMemo(() => {
     const initialData = Object.keys(dataPoints)
       .map((key) => {
@@ -29,11 +29,13 @@ export function useIntervalArrays(firstIndex, dataPoints) {
 
     return initialData;
   }, [dataPoints]);
+  
+  
 
 
-  const oneDayArray = setIntradayArray(firstIndex, sortedData, "1D");
-  const oneWeekArray = setIntradayArray(firstIndex, sortedData, "1W");
-  const oneMonthArray = setIntradayArray(firstIndex, sortedData, "1M");
+  const oneDayArray = setIntradayArray(lastTradingDay, sortedData, "1D");
+  const oneWeekArray = setIntradayArray(lastTradingDay, sortedData, "1W");
+  const oneMonthArray = setIntradayArray(lastTradingDay, sortedData, "1M");
 
   return { oneDayArray, oneWeekArray, oneMonthArray };
 }

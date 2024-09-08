@@ -41,6 +41,7 @@ export function endsWithFullHour(timeString) {
   return timeString.includes(":00") && timeString.split(":")[1].startsWith("00");
 }
 
+
 export function isFullHourDivisibleByThree(timeString) {
   // Check if the time ends with ":00"
   if (endsWithFullHour(timeString)) {

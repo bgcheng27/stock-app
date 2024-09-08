@@ -8,35 +8,43 @@ Author: Brian Cheng
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-import { BasicCard } from "../components/card-components/BasicCard";
-import { Table } from "../components/table-compenents/Table";
-import { TableRow } from "../components/table-compenents/TableRow";
-
+import { useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import {
-  camelize,
-  formatDateForTable,
-  formatKMBT,
-  number_format,
-  toPercentValue,
-  twoDecimal,
-} from "../js/formatters";
-import { StockAreaChart } from "../components/chart-components/StockAreaChart";
-
-import { fetchStockData } from "../js/hooks/fetchStockData";
-import { useFinancials } from "../js/hooks/useFinancials";
-import { DropdownMenu } from "../components/DropdownMenu";
 import {
   intervalTypeDisplayTextArray,
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
-import { ERROR_MESSAGES } from "../js/errorHandler";
-import { formatDateTimeLabel } from "../js/tooltipHelpers";
+
+// Components
+import { BasicCard } from "../components/card-components/BasicCard";
+import { DropdownMenu } from "../components/DropdownMenu";
 import { OverviewRow } from "../components/OverviewRow";
-import { useState } from "react";
+import { StockAreaChart } from "../components/chart-components/StockAreaChart";
+import { Table } from "../components/table-compenents/Table";
+import { TableRow } from "../components/table-compenents/TableRow";
+
+
+// Helpers
+import {
+  formatKMBT,
+  number_format,
+  toPercentValue,
+  twoDecimal,
+} from "../js/helpers/numberHelpers";
+import {
+  camelize,
+  formatDateForTable
+} from "../js/helpers/tableHelpers";
+import { formatDateTimeLabel } from "../js/helpers/tooltipHelpers";
+
+
+// Hooks
+import { fetchStockData } from "../js/hooks/fetchStockData";
+import { useFinancials } from "../js/hooks/useFinancials";
 import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
 
-const NUM_INTERVALS = 3;
+
+const TABLE_COLUMNS = 3;
 const IS_DEMO = true;
 
 
@@ -63,21 +71,12 @@ function StockInfo() {
     Exchange: primaryExchange,
   } = overview;
 
-  if (incomeStatementData["Information"]) {
-    throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
-  }
-
-  if (symbol == undefined) {
-    throw new Error(ERROR_MESSAGES.SYMBOL_NOT_FOUND);
-  }
-
   if (error) {
     throw new Error(error);
   }
 
   const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
-  const [graph, setGraph] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"})
-
+  const [graph, setGraph] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D" })
 
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
@@ -85,11 +84,14 @@ function StockInfo() {
 
   return (
     <>
+      {/* Header */}
       <h1 className="h3 mb-1 text-gray-800">
         {companyName} ({symbol})
       </h1>
       <p>Last Closing: {formatDateTimeLabel(lastRefreshFull)}</p>
 
+
+      {/* Interval Type Buttons */}
       <button
         onClick={() => {
           setGraph((prev) => {
@@ -109,11 +111,10 @@ function StockInfo() {
       }} className="btn btn-success">1M</button>
 
 
-
-      {/* Area Chart */}
+      {/* First Row */}
       <div className="row">
+        {/* Stock Area Chart */}
         <div className="col-xl-8 col-lg-6">
-          {/* Stock Area Chart */}
           <BasicCard title={graph.text} styleClasses="chart-padding">
             <StockAreaChart
               config={{
@@ -125,7 +126,7 @@ function StockInfo() {
           </BasicCard>
         </div>
 
-        {/* Stock Info: (Open, Close, High, etc.) */}
+        {/* Quote Data */}
         <div className="col-xl-4 col-lg-6">
           <BasicCard title="Quote">
             <OverviewRow
@@ -157,6 +158,7 @@ function StockInfo() {
         </div>
       </div>
 
+
       {/* Set Financial State Menu */}
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
       <div className="row">
@@ -175,8 +177,10 @@ function StockInfo() {
         </div>
       </div>
 
-      {/* Financial Statements */}
+
+      {/* Second Row */}
       <div className="row">
+        {/* Financial Statements */}
         <div className="col-xl-8 col-lg-6">
           <BasicCard
             title={`${financials.cardTitle} (${
@@ -191,7 +195,7 @@ function StockInfo() {
                 <tr>
                   <th>Breakdown</th>
                   {financials.currentData[financials.intervalType]
-                    .slice(0, NUM_INTERVALS)
+                    .slice(0, TABLE_COLUMNS)
                     .map((report) => {
                       return (
                         <th key={crypto.randomUUID()}>
@@ -207,10 +211,10 @@ function StockInfo() {
                   return (
                     <TableRow key={index} label={label}>
                       {financials.currentData[financials.intervalType]
-                        .slice(0, NUM_INTERVALS)
+                        .slice(0, TABLE_COLUMNS)
                         .map((report) => {
                           return (
-                            <td key={crypto.randomUUID()}>{`$${number_format(
+                            <td key={crypto.randomUUID()}>{`${number_format(
                               report[camelize(label)]
                             )}`}</td>
                           );
@@ -222,6 +226,8 @@ function StockInfo() {
             </Table>
           </BasicCard>
         </div>
+
+        {/* About Section */}
         <div className="col-xl-4 col-lg-6">
           <BasicCard title="About">
             <p>

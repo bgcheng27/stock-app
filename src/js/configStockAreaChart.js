@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import {
   convertToAMPM,
   isFullHourDivisibleByThree,
-} from "./dateHelpers";
-import { formatDateTimeLabel, formatMonthDay, getPropValue } from "./tooltipHelpers";
+} from "./helpers/dateTimeHelpers";
+import { formatDateTimeLabel, formatMonthDay, getPropValue } from "./helpers/tooltipHelpers";
 import { useSortedMarketData } from "./hooks/useSortedMarketData";
 
 const LINE_COLOR = {
