@@ -11,9 +11,6 @@ export function RouteLayout() {
     <>
     <div className={isLoading ? "loading-spinner" : undefined}></div>
       <div id="wrapper" className={isLoading ? "loading" : undefined}>
-        {/* Sidebar */}
-        {/* <SideBar /> */}
-
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content">
             <TopBar />
@@ -22,9 +19,9 @@ export function RouteLayout() {
                 <Outlet />
               </ContentErrorBoundary>
             </div>
+            <footer className="bg-primary text-light text-center p-3">Copyright © Brian Cheng 2024; For Demosration Purposes Only</footer>
           </div>
-        </div>
-        
+        </div>        
       </div>
     </>
   );

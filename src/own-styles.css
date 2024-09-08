@@ -87,3 +87,19 @@
   background-color: #ddd;
 }
 
+
+.chart-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+
+.overview-label-styles {
+  border-top: 0.75px solid #666;
+  padding: 0.5rem 0rem;
+}
+
+.overview-label-styles:first-child {
+  border-top: none
+}
+

@@ -8,31 +8,45 @@ Author: Brian Cheng
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-import { BasicCard } from "../components/card-components/BasicCard";
-import { Table } from "../components/table-compenents/Table";
-import { TableRow } from "../components/table-compenents/TableRow";
-
+import { useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import {
-  camelize,
-  formatDateForTable,
-  number_format,
-  twoDecimal,
-} from "../js/formatters";
-import { StockAreaChart } from "../components/chart-components/StockAreaChart";
-
-import { fetchStockData } from "../js/hooks/fetchStockData";
-import { useSortedMarketData } from "../js/hooks/useSortedMarketData";
-import { useFinancials } from "../js/hooks/useFinancials";
-import { DropdownMenu } from "../components/DropdownMenu";
 import {
   intervalTypeDisplayTextArray,
   statementDisplayTextArray,
 } from "../js/data/financialsConfig";
-import { ERROR_MESSAGES } from "../js/mockData";
 
-const NUM_INTERVALS = 3;
+// Components
+import { BasicCard } from "../components/card-components/BasicCard";
+import { DropdownMenu } from "../components/DropdownMenu";
+import { OverviewRow } from "../components/OverviewRow";
+import { StockAreaChart } from "../components/chart-components/StockAreaChart";
+import { Table } from "../components/table-compenents/Table";
+import { TableRow } from "../components/table-compenents/TableRow";
+
+
+// Helpers
+import {
+  formatKMBT,
+  number_format,
+  toPercentValue,
+  twoDecimal,
+} from "../js/helpers/numberHelpers";
+import {
+  camelize,
+  formatDateForTable
+} from "../js/helpers/tableHelpers";
+import { formatDateTimeLabel } from "../js/helpers/tooltipHelpers";
+
+
+// Hooks
+import { fetchStockData } from "../js/hooks/fetchStockData";
+import { useFinancials } from "../js/hooks/useFinancials";
+import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
+
+
+const TABLE_COLUMNS = 3;
 const IS_DEMO = true;
+
 
 function StockInfo() {
   const {
@@ -43,76 +57,107 @@ function StockInfo() {
     dataPoints,
     quoteData,
     description,
+    companyName,
+    overview,
     lastRefreshDate,
+    lastRefreshFull,
     error,
   } = useLoaderData();
-  
-  if (incomeStatementData["Information"]) {
-    throw new Error(ERROR_MESSAGES.FAILED_TO_RETRIEVE_DATA);
-  }
 
-  if (symbol == undefined) {
-    throw new Error(ERROR_MESSAGES.SYMBOL_NOT_FOUND);
-  }
+  const {
+    PERatio: peRatio,
+    MarketCapitalization: marketCap,
+    DividendYield: dividendYield,
+    Exchange: primaryExchange,
+  } = overview;
 
   if (error) {
     throw new Error(error);
   }
 
+  const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
+  const [graph, setGraph] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D" })
+
   const { financials, toggleIntervalType, displayFinancialStatement } =
     useFinancials(incomeStatementData, balanceSheetData, cashFlowData);
-  const { volumeArray, openArray, dateTimeArray, timeLabels } =
-    useSortedMarketData(dataPoints, lastRefreshDate);
+
 
   return (
     <>
-      <h1 className="h3 mb-0 text-gray-800 mb-4">{symbol}</h1>
+      {/* Header */}
+      <h1 className="h3 mb-1 text-gray-800">
+        {companyName} ({symbol})
+      </h1>
+      <p>Last Closing: {formatDateTimeLabel(lastRefreshFull)}</p>
 
-      {/* Area Chart */}
+
+      {/* Interval Type Buttons */}
+      <button
+        onClick={() => {
+          setGraph((prev) => {
+            return {...prev, array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D"}
+          })
+        }}
+        className="btn btn-primary">1D</button>
+      <button onClick={() => { 
+        setGraph((prev) => {
+          return {...prev, array: oneWeekArray, prevClose: undefined, text: "1W"}
+        })
+        }} className="btn btn-danger">1W</button>
+      <button onClick={() => {
+        setGraph((prev) => {
+          return {...prev, array: oneMonthArray, prevClose: undefined, text: "1M"}
+        })
+      }} className="btn btn-success">1M</button>
+
+
+      {/* First Row */}
       <div className="row">
+        {/* Stock Area Chart */}
         <div className="col-xl-8 col-lg-6">
-          {/* Stock Area Chart */}
-          <BasicCard title={symbol}>
+          <BasicCard title={graph.text} styleClasses="chart-padding">
             <StockAreaChart
               config={{
-                xTimeLabels: timeLabels,
-                xLabels: dateTimeArray,
-                xData: openArray,
-                xVolume: volumeArray,
-                previousClose: quoteData["08. previous close"],
+                graphArray: graph.array,
+                previousClose: graph.prevClose
               }}
+              intervalText={graph.text}
             />
           </BasicCard>
         </div>
 
-        {/* Stock Info: (Open, Close, High, etc.) */}
+        {/* Quote Data */}
         <div className="col-xl-4 col-lg-6">
           <BasicCard title="Quote">
-            <div className="d-flex justify-content-between">
-              <span>Previous Close:</span>
-              <span>${twoDecimal(quoteData["08. previous close"])}</span>
-            </div>
-
-            <div className="d-flex justify-content-between align-items-center">
-              <span>Open:</span>
-              <span>${twoDecimal(quoteData["02. open"])}</span>
-            </div>
-
-            <div className="d-flex justify-content-between">
-              <span>Day Range:</span>
-              <span>
-                ${twoDecimal(quoteData["04. low"])} - $
-                {twoDecimal(quoteData["03. high"])}
-              </span>
-            </div>
-
-            <div className="d-flex justify-content-between">
-              <span>Volume:</span>
-              <span>{number_format(quoteData["06. volume"])}</span>
-            </div>
+            <OverviewRow
+              label="Previous Close"
+              value={`$${twoDecimal(quoteData["08. previous close"])}`}
+            />
+            <OverviewRow
+              label="Open"
+              value={`$${twoDecimal(quoteData["02. open"])}`}
+            />
+            <OverviewRow
+              label="Day Range"
+              value={`$${twoDecimal(quoteData["04. low"])} - $${twoDecimal(
+                quoteData["03. high"]
+              )}`}
+            />
+            <OverviewRow
+              label="Volume"
+              value={number_format(quoteData["06. volume"])}
+            />
+            <OverviewRow label="Market Cap" value={formatKMBT(marketCap)} />
+            <OverviewRow label="P/E Ratio" value={peRatio} />
+            <OverviewRow
+              label="Dividend Yield"
+              value={`${toPercentValue(dividendYield)}%`}
+            />
+            <OverviewRow label="Primary Exchange" value={primaryExchange} />
           </BasicCard>
         </div>
       </div>
+
 
       {/* Set Financial State Menu */}
       <h1 className="h3 mb-0 text-gray-800 mb-4">Financials</h1>
@@ -132,8 +177,10 @@ function StockInfo() {
         </div>
       </div>
 
-      {/* Financial Statements */}
+
+      {/* Second Row */}
       <div className="row">
+        {/* Financial Statements */}
         <div className="col-xl-8 col-lg-6">
           <BasicCard
             title={`${financials.cardTitle} (${
@@ -148,7 +195,7 @@ function StockInfo() {
                 <tr>
                   <th>Breakdown</th>
                   {financials.currentData[financials.intervalType]
-                    .slice(0, NUM_INTERVALS)
+                    .slice(0, TABLE_COLUMNS)
                     .map((report) => {
                       return (
                         <th key={crypto.randomUUID()}>
@@ -164,10 +211,10 @@ function StockInfo() {
                   return (
                     <TableRow key={index} label={label}>
                       {financials.currentData[financials.intervalType]
-                        .slice(0, NUM_INTERVALS)
+                        .slice(0, TABLE_COLUMNS)
                         .map((report) => {
                           return (
-                            <td key={crypto.randomUUID()}>{`$${number_format(
+                            <td key={crypto.randomUUID()}>{`${number_format(
                               report[camelize(label)]
                             )}`}</td>
                           );
@@ -179,9 +226,14 @@ function StockInfo() {
             </Table>
           </BasicCard>
         </div>
-        <div className="col-xl-4 col-lg-2">
+
+        {/* About Section */}
+        <div className="col-xl-4 col-lg-6">
           <BasicCard title="About">
-            <p>{description} <a href={`https://en.wikipedia.org/wiki/${symbol}`}>Wikipedia</a></p>
+            <p>
+              {description}{" "}
+              <a href={`https://en.wikipedia.org/wiki/${symbol}`}>Wikipedia</a>
+            </p>
           </BasicCard>
         </div>
       </div>

@@ -2,16 +2,17 @@ import { financialsDemo, getFinancials } from "../../api/financials";
 import { getQuote, getQuoteDemo, getTimeSeries, getTimeSeriesDemo, getOverview, getOverviewDemo } from "../../api/marketData";
 import { INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW } from "../data/financialsConfig"
 
-// maybe a custom hook
+
 export async function fetchStockData(isDemo, signal, symbol) {
   let incomeStatementData,
     balanceSheetData,
     cashFlowData,
     marketData,
     quoteData,
-    description,
+    overview,
     expectedSymbol,
-    lastRefreshDate;
+    lastRefreshDate,
+    lastRefreshFull;
 
   const GRAPH_INTERVAL = isDemo ? "5min" : "1min";
   
@@ -23,7 +24,7 @@ export async function fetchStockData(isDemo, signal, symbol) {
     cashFlowData = financialsDemo(CASH_FLOW.apiCall, { signal });
     marketData = await getTimeSeriesDemo({ signal });
     quoteData = await getQuoteDemo({ signal });
-    description = await getOverviewDemo({ signal })
+    overview = await getOverviewDemo({ signal })
   } else {
     incomeStatementData = getFinancials(
       INCOME_STATEMENT.apiCall,
@@ -49,12 +50,13 @@ export async function fetchStockData(isDemo, signal, symbol) {
       { signal }
     );
     quoteData = await getQuote(symbol.toUpperCase(), { signal });
-    description = await getOverview(symbol.toUpperCase(), { signal })
+    overview = await getOverview(symbol.toUpperCase(), { signal })
   }
 
   if (marketData["Meta Data"]) {
     expectedSymbol = marketData["Meta Data"]["2. Symbol"]
     lastRefreshDate = marketData["Meta Data"]["3. Last Refreshed"].split(" ")[0]
+    lastRefreshFull = marketData["Meta Data"]["3. Last Refreshed"]
   } else {
     expectedSymbol = undefined
   }
@@ -67,7 +69,10 @@ export async function fetchStockData(isDemo, signal, symbol) {
     symbol: expectedSymbol,
     dataPoints: marketData[`Time Series (${GRAPH_INTERVAL})`],
     quoteData: quoteData["Global Quote"],
-    description: description["Description"],
-    lastRefreshDate
+    description: overview["Description"],
+    companyName: overview["Name"],
+    overview,
+    lastRefreshDate,
+    lastRefreshFull
   };
 }
