@@ -16,10 +16,10 @@ import {
 } from "../js/data/financialsConfig";
 
 // Components
-import { BasicCard } from "../components/card-components/BasicCard";
+import { BasicCard } from "../components/BasicCard";
 import { DropdownMenu } from "../components/DropdownMenu";
 import { OverviewRow } from "../components/OverviewRow";
-import { StockAreaChart } from "../components/chart-components/StockAreaChart";
+import { StockAreaChart } from "../components/StockAreaChart";
 import { Table } from "../components/table-compenents/Table";
 import { TableRow } from "../components/table-compenents/TableRow";
 
@@ -46,7 +46,6 @@ import { handleErrors } from "../js/errorHandler";
 
 
 const TABLE_COLUMNS = 3;
-export const IS_DEMO = true;
 
 
 function StockInfo() {
@@ -240,9 +239,9 @@ function StockInfo() {
   );
 }
 
-async function loader({ request: { signal }, params: { symbol } }) {
+async function loader({ request: { signal }}) {
   try {
-    return fetchStockData(IS_DEMO, signal, symbol);
+    return fetchStockData(signal);
   } catch (error) {
     return { error: error.message };
   }

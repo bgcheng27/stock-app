@@ -9,7 +9,7 @@ import {
   Filler,
 } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
-import { configStockAreaChart } from "../../js/configStockAreaChart";
+import { configStockAreaChart } from "../js/configStockAreaChart";
 
 import { Line } from "react-chartjs-2";
 
