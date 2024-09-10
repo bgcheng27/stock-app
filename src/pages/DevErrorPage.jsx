@@ -1,4 +1,4 @@
-export function ErrorPage({ error, errorInfo }) {
+export function DevErrorPage({ error, errorInfo }) {
   return (
     <>
       <h1>Something Went Wrong!</h1>

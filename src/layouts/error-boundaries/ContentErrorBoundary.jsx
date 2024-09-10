@@ -1,7 +1,6 @@
 import React from "react";
-import { ErrorPage } from "../../pages/ErrorPage";
-import { NotFound } from "../../pages/NotFound"
-import { ERROR_MESSAGES, formatErrorMessage } from "../../js/errorHandler";
+import { ProdErrorPage } from "../../pages/ProdErrorPage"
+import { HTTP_ERRORS, getPlainErrorMessage, isHttpError, parseHttpErrorMessage } from "../../js/errorHandler";
 
 export class ContentErrorBoundary extends React.Component {
   state = { hasError: false, error: null, errorInfo: null, message: null }
@@ -23,12 +22,18 @@ export class ContentErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      
-      if (this.state.message === formatErrorMessage(ERROR_MESSAGES.SYMBOL_NOT_FOUND)) {
-        return <NotFound />
-      }
+      const errorText = getPlainErrorMessage(this.state.error.toString())
+      console.log(errorText)
 
-      return <ErrorPage error={this.state.error} errorInfo={this.state.errorInfo} />
+
+      if (isHttpError(errorText)) {
+        const { status, message } = parseHttpErrorMessage(errorText);
+
+        return <ProdErrorPage statusCode={status} message={message} />
+      }
+      
+
+      return <ProdErrorPage statusCode={HTTP_ERRORS.SERVER_ERROR.status} message={HTTP_ERRORS.SERVER_ERROR.message} />
     }
 
     return this.props.children;

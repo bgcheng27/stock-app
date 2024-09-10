@@ -42,13 +42,15 @@ import { formatDateTimeLabel } from "../js/helpers/tooltipHelpers";
 import { fetchStockData } from "../js/hooks/fetchStockData";
 import { useFinancials } from "../js/hooks/useFinancials";
 import { useIntervalArrays } from "../js/hooks/useIntervalArrays";
+import { handleErrors } from "../js/errorHandler";
 
 
 const TABLE_COLUMNS = 3;
-const IS_DEMO = true;
+export const IS_DEMO = true;
 
 
 function StockInfo() {
+  const apiData = useLoaderData();
   const {
     incomeStatementData,
     balanceSheetData,
@@ -61,8 +63,9 @@ function StockInfo() {
     overview,
     lastRefreshDate,
     lastRefreshFull,
-    error,
-  } = useLoaderData();
+  } = apiData;
+
+  handleErrors(apiData)
 
   const {
     PERatio: peRatio,
@@ -70,10 +73,6 @@ function StockInfo() {
     DividendYield: dividendYield,
     Exchange: primaryExchange,
   } = overview;
-
-  if (error) {
-    throw new Error(error);
-  }
 
   const { oneDayArray, oneWeekArray, oneMonthArray } = useIntervalArrays(lastRefreshDate, dataPoints);
   const [graph, setGraph] = useState({ array: oneDayArray, prevClose: quoteData["08. previous close"], text: "1D" })
