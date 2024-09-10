@@ -7,7 +7,7 @@ export function SearchDropdown({ options }) {
         {options.map((option) => {
           return (
             <li className="search-list-item">
-              <NavLink>{option["1. symbol"]}</NavLink>
+              <NavLink to={`/stock/${option["1. symbol"]}`}>{option["1. symbol"]}</NavLink>
             </li>
           )
         })}

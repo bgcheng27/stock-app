@@ -1,22 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchDropdown } from "../components/SearchDropdown";
+import { search, searchDemo } from "../api/search";
+import { IS_DEMO } from "../pages/StockInfo";
 
 export function TopBar() {
   const [searchInput, setSearchInput] = useState("");
 
   const [tickerOptions, setTickerOptions] = useState([]);
 
+
+  useEffect(() => {
+    const controller = new AbortController()    
+    fetchTickerOptions(searchInput, { signal: controller.signal });
+
+    return () => {
+      controller.abort();
+    }
+  }, [searchInput])
+
   
   const handleInputChange = (event) => {
     const term = event.target.value;
 
     setSearchInput(term);
-    fetchTickerOptions(term);
   };
 
   // Function to fetch dropdown options from an API
   const fetchTickerOptions = async (term) => {
-    const data = await searchDemo()
+    const data = IS_DEMO ? await searchDemo(term) : await search(term)
 
     setTickerOptions(data.bestMatches)
     console.log(data.bestMatches)
@@ -52,7 +63,7 @@ export function TopBar() {
               </button>
             </div>
 
-            { tickerOptions.length > 0 && <SearchDropdown options={tickerOptions} /> }
+            { tickerOptions?.length > 0 && <SearchDropdown options={tickerOptions} /> }
 
           </div>      
         </form>
